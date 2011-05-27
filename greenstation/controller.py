@@ -17,11 +17,12 @@ class AbstractController(Thread):
       self._sample_rate = float(config_sample_rate)
     
     self.sensorHandlers = []
+    self._dataHandler = None
     self.start()
 
   def run(self):
     while True:
-      self.process_sensor_data
+      self.process_sensor_data()
       time.sleep(self._sample_rate)
   
   def set_data_handler(self,dataHandler):  
@@ -29,8 +30,11 @@ class AbstractController(Thread):
 
   def process_sensor_data(self):
     if self.sensorHandlers != None:
-      for h in self.sensorHandlers:
-        sensors = h.get_sensors()        
+      print(self.sensorHandlers)
+      for h in self.sensorHandlers:        
+        sensors = h.get_sensors()  
+        print(sensors)
+        print(self._dataHandler)
         if self._dataHandler != None and sensors != None:
           self._dataHandler.render_data(sensors)
 
@@ -44,7 +48,4 @@ class DefaultController(AbstractController):
       raise Exception('Config','No OneWire/owfsMount defined')
        
     self.sensorHandlers.append(OneWireSensorHandler(owpath))
-
-  def process_sensor_data(self):
-    AbstractController.process_sensor_data(self)
 

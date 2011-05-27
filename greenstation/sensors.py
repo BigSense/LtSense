@@ -20,7 +20,7 @@ class AbstractSensor:
     return ('Unimplemented')
 
 
-class TemperatureSensor(AbstractSensor):
+class AbstractOWFSSensor(AbstractSensor):
 
   def __init__(self,uid,dataFile):
     AbstractSensor.__init__(self)
@@ -30,18 +30,28 @@ class TemperatureSensor(AbstractSensor):
   def get_id(self):
     return self.id;
   
-  def get_type(self):
-    return "Temperature"
-
   def get_data(self):
     f = open(self.dataFile,'r')
     data = f.read()
     f.close()
     return data; 
     
-  def get_units(self):
-    pass    
 
+class TemperatureSensor(AbstractOWFSSensor):
+
+  def get_type(self):
+    return "Temperature"
+
+  def get_units(self):
+    return "C"
+
+class CountingSensor(AbstractOWFSSensor):
+  
+  def get_type(self):
+    return "Counter"
+
+  def get_units(self):
+    return "rev"
 
 class AbstractSensorHandler:
 
@@ -63,23 +73,19 @@ class OneWireSensorHandler(AbstractSensorHandler):
     ret = []
     for p in path:
        (name,ext) = (os.path.splitext(p))
-       try:
-         stype = int( name )
-         if(stype == 10):
-           tfile = os.path.join(os.path.join(self.owfs_mount,p),'temperature')
-           ret.append( TemperatureSensor(ext,tfile) )
-       except ValueError:
-         pass
+       if name == '10':
+         tfile = os.path.join(os.path.join(self.owfs_mount,p),'temperature')
+         ret.append( TemperatureSensor(ext.lstrip('.'),tfile) )
+       if name == '1D':
+         tfile =  os.path.join(os.path.join(self.owfs_mount,p),'counters.ALL')
+         ret.append( CountingSensor(ext.lstrip('.'),tfile) )
+    
     return ret
 
  
 class GPSSensorHandler(AbstractSensorHandler):
   pass
 
-    
-
-class OneWireTempSensor(AbstractSensor):
-  pass
   
 class GPSSensor(AbstractSensor):
   pass
