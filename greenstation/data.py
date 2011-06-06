@@ -5,7 +5,7 @@ import time
 
 class AbstractDataHandler():
 
-  def __init__(self,config):
+  def __init__(self):
     pass
     
   def render_data(self,sensors):
@@ -13,17 +13,16 @@ class AbstractDataHandler():
 
 class SQLiteDataHandler(AbstractDataHandler):
   
-  def __init__(self,config):
-    AbstractDataHandler.__init__(self,config)   
-    #todo, get from confi
+  def __init__(self):
+    AbstractDataHandler.__init__(self)   
     self.__conn = None
-    self.sqlFile = ('data.sqlite')
-    
+
+
+  def set_file(self,dataFile):
+    self.sqlFile = dataFile
     self.__get_cursor().execute("CREATE TABLE IF NOT EXISTS sensor_data (stamp DATETIME,type TEXT, sensor_id Text,date Text)")
     self.__conn.commit()
 
-  #def __del__(self):
-  #  self.conn.close()
 
   def __get_cursor(self):
     try:
@@ -41,7 +40,6 @@ class SQLiteDataHandler(AbstractDataHandler):
         'INSERT INTO sensor_data VALUES(?,?,?,?)' , (now,s.get_type(),s.get_id(),s.get_data())
         )
       self.__conn.commit()
-      print(s.get_data())
 
 class WaterMLDataHandler(AbstractDataHandler):
  

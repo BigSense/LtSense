@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import logging
 
 class AbstractSensor:
 
@@ -64,9 +65,11 @@ class AbstractSensorHandler:
 
 class OneWireSensorHandler(AbstractSensorHandler):
 
-  def __init__(self,owfs_mount):
+  def __init__(self):
     AbstractSensorHandler.__init__(self)
-    self.owfs_mount = owfs_mount  
+
+  def set_owfs_mount(self,owfs_mount):
+    self.owfs_mount = owfs_mount
 
   def get_sensors(self):
     path = os.listdir(self.owfs_mount)
