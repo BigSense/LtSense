@@ -12,7 +12,7 @@ class AbstractController(Thread):
     Thread.__init__(self)
     
     self.sensorHandlers = []
-    self._dataHandler = None
+    self._dataHandlers = []
     self.start()
 
   def set_sample_rate(self,rate):
@@ -23,18 +23,20 @@ class AbstractController(Thread):
       self.process_sensor_data()
       time.sleep(self._sample_rate)
   
-  def set_data_handler(self,dataHandler):  
-    self._dataHandler = dataHandler
+  def set_data_handlers(self,dataHandlers):  
+    self._dataHandlers = dataHandlers
 
   def set_sensor_handlers(self,sensorHandlers):
     self.sensorHandlers = sensorHandlers
 
   def process_sensor_data(self):
     if self.sensorHandlers != None:
+      sensors = []
       for h in self.sensorHandlers:        
-        sensors = h.get_sensors()  
-        if self._dataHandler != None and sensors != None:
-          self._dataHandler.render_data(sensors)
+        sensors.extend( h.get_sensors() )
+      if self._dataHandlers != None:
+        for d in self._dataHandlers:
+          d.render_data(sensors)
 
 class DefaultController(AbstractController):
 

@@ -2,6 +2,7 @@
 
 import os
 import logging
+import fcntl, socket, struct
 
 class AbstractSensor:
 
@@ -86,9 +87,75 @@ class OneWireSensorHandler(AbstractSensorHandler):
     return ret
 
  
-class GPSSensorHandler(AbstractSensorHandler):
-  pass
-
+class GeneralSensorHandler(AbstractSensorHandler):
   
-class GPSSensor(AbstractSensor):
-  pass
+  def __init__(self):
+    AbstractSensorHandler.__init__(self)
+    self.__sensors = []
+
+  def set_sensors(self,sensors):
+    self.__sensors = sensors
+
+  def add_sensors(self,sensors):
+    self.__sensors.extend(sensors)
+  
+  def get_sensors(self):
+    return self.__sensors
+
+
+class MacAddressIdentificationSensor(AbstractSensor):
+
+  def __init__(self):
+    AbstractSensor.__init__(self)
+    self.__adapter = 'eth0'
+
+  def get_id(self):
+    return self.__getHwAddr()
+
+  def get_type(self):
+    return "Identifier"
+
+  def get_data(self):
+    return self.__getHwAddr()
+
+  def get_units(self):
+    return "Hex"
+
+  def set_adapter(self,adapter):
+    self.__adapter = adapter
+
+  #Taken from http://stackoverflow.com/questions/159137/getting-mac-address
+  def __getHwAddr(self):
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    info = fcntl.ioctl(s.fileno(), 0x8927,  struct.pack('256s', self.__adapter[:15]))
+    return ''.join(['%02x:' % ord(char) for char in info[18:24]])[:-1]
+
+
+
+class StaticInformationSensor(AbstractSensor):
+
+  def __init__(self):
+    AbstractSensor.__init__(self)
+    self.__id = "Unimplemented"
+    self.__type = "Unimplemented"
+    self.__data = "Unimplemented"
+    self.__units = "Unimplemented"
+
+  def set_id(self,sid):
+    self.__id = sid
+  def set_type(self,stype):
+    self.__type = stype
+  def set_data(self,sdata):
+    self.__data = sdata
+  def set_units(self,units):
+    self.__units = units
+
+  def get_id(self):
+    return self.__id
+  def get_type(self):
+    return self.__type
+  def get_data(self):
+    return self.__data
+  def get_units(self):
+    return self.__units
+   

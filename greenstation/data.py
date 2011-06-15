@@ -2,6 +2,7 @@
 
 import sqlite3
 import time
+from xml.dom.minidom import Document
 
 class AbstractDataHandler():
 
@@ -40,6 +41,49 @@ class SQLiteDataHandler(AbstractDataHandler):
         'INSERT INTO sensor_data VALUES(?,?,?,?)' , (now,s.get_type(),s.get_id(),s.get_data())
         )
       self.__conn.commit()
+
+class GreenOvenDataHandler(AbstractDataHandler):
+
+  def __init__(self):
+    AbstractDataHandler.__init__(self)
+ 
+  def set_endpoint(self,hostname):
+    self.__remote_host = hostname
+
+  def render_data(self,sensors):
+    now = time.time()
+    doc = Document()
+    root = doc.createElement('GreenData')
+
+    ts = doc.createElement('timestamp')
+    ts.setAttribute('zone','UTC')
+    ts.appendChild(doc.createTextNode(str(time.time())))
+
+    sens = doc.createElement('Sensors')
+
+    for s in sensors:
+      senNode = doc.createElement('Sensor')
+
+      did = doc.createElement('id')
+      dtype = doc.createElement('type')
+      dunits = doc.createElement('units')
+      ddata = doc.createElement('data')
+
+      did.appendChild(doc.createTextNode(s.get_id()))
+      dtype.appendChild(doc.createTextNode(s.get_type()))
+      dunits.appendChild(doc.createTextNode(s.get_units()))
+      ddata.appendChild(doc.createTextNode(s.get_data()))
+ 
+      senNode.appendChild(did)
+      senNode.appendChild(dtype)
+      senNode.appendChild(dunits)
+      senNode.appendChild(ddata)
+      sens.appendChild(senNode)
+
+    root.appendChild(ts)
+    root.appendChild(sens)
+    doc.appendChild(root)
+    print doc.toprettyxml(indent=' ')
 
 class WaterMLDataHandler(AbstractDataHandler):
  
