@@ -12,20 +12,23 @@ class AbstractDataHandler():
   def render_data(self,sensors):
     pass
 
-class SQLiteDataHandler(AbstractDataHandler):
+"""class SQLiteDataHandler(AbstractDataHandler):
   
   def __init__(self):
     AbstractDataHandler.__init__(self)   
     self.__conn = None
 
+  def _getDataFile(self):
+    return self.sqlFile
+  
+  def _setDataFile(self,df):
+      self.sqlFile = df
+      self.__get_cursor().execute("CREATE TABLE IF NOT EXISTS sensor_data (stamp DATETIME,type TEXT, sensor_id Text,date Text)")
+      self.__conn.commit()      
 
-  def set_file(self,dataFile):
-    self.sqlFile = dataFile
-    self.__get_cursor().execute("CREATE TABLE IF NOT EXISTS sensor_data (stamp DATETIME,type TEXT, sensor_id Text,date Text)")
-    self.__conn.commit()
+  dataFile = property(_getDataFile,_setDataFile)
 
-
-  def __get_cursor(self):
+  def __cursor(self):
     try:
       if self.__conn == None:
         self.__conn = sqlite3.connect(self.sqlFile)
@@ -37,18 +40,15 @@ class SQLiteDataHandler(AbstractDataHandler):
   def render_data(self,sensors):
     now = time.time()
     for s in sensors:
-      self.__get_cursor().execute(
+      self.__cursor().execute(
         'INSERT INTO sensor_data VALUES(?,?,?,?)' , (now,s.get_type(),s.get_id(),s.get_data())
         )
       self.__conn.commit()
-
+"""
 class GreenOvenDataHandler(AbstractDataHandler):
 
   def __init__(self):
     AbstractDataHandler.__init__(self)
- 
-  def set_endpoint(self,hostname):
-    self.__remote_host = hostname
 
   def render_data(self,sensors):
     now = time.time()
@@ -69,10 +69,10 @@ class GreenOvenDataHandler(AbstractDataHandler):
       dunits = doc.createElement('units')
       ddata = doc.createElement('data')
 
-      did.appendChild(doc.createTextNode(s.get_id()))
-      dtype.appendChild(doc.createTextNode(s.get_type()))
-      dunits.appendChild(doc.createTextNode(s.get_units()))
-      ddata.appendChild(doc.createTextNode(s.get_data()))
+      did.appendChild(doc.createTextNode(s.id))
+      dtype.appendChild(doc.createTextNode(s.type))
+      dunits.appendChild(doc.createTextNode(s.units))
+      ddata.appendChild(doc.createTextNode(s.data))
  
       senNode.appendChild(did)
       senNode.appendChild(dtype)

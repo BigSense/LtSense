@@ -4,6 +4,7 @@ from optparse import OptionParser,OptionGroup
 import sys
 import logging 
 import greenstation.loader
+import datetime 
 
 def logfile_arg():
    def func(option,opt_str,value,parser):

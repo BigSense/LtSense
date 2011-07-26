@@ -2,7 +2,9 @@
 import ConfigParser
 import logging
 
-loader_config = ConfigParser.ConfigParser()
+config = ConfigParser.RawConfigParser()
+#remove case insensitivity
+config.optionxform = lambda option: option
 
 loader_classes = {}
 
@@ -16,22 +18,11 @@ def load_obj(name):
     return getattr(mod,clss)()
 
 def load_config(configFile):
-  loader_config.readfp(open(configFile,'r'))
-  
-def get_class(idu):
-  if idu in loader_classes: 
-    logging.debug('Loading Cached Object ' + idu)
-    return loader_classes[idu]
+  config.readfp(open(configFile,'r'))
 
-  bean = loader_config.items(idu)
-  name = 'greenstation.'+loader_config.get(idu,'class')
-  obj = load_obj(name)
-  logging.debug('Created Object %s' % name)
-  for (key,value) in bean:
-    if key == 'class':
-      continue
-    else:    
-      arg = None
+def set_args(object,key,value):
+    arg = None
+    if '\\' in value:
       (optype,opt) = value.split('\\')
       if optype == 'class-ref':
         if opt.startswith('{'):
@@ -40,13 +31,43 @@ def get_class(idu):
             arg.append(get_class(c))
         else:
           arg = get_class(opt)
-      elif optype == 'float':
-        arg = float(opt)
-      elif optype == 'string': 
-        arg = opt
+    else:
+      arg = value
+    
+    logging.debug('Setting attribute %s to %s for class %s' % (key,arg,object))
+    setattr(object,key,arg)
 
-      logging.debug('Setting attribute %s to %s for class %s' % (key,arg,obj))
-      getattr(obj,"set_%s" % key)(arg)
+def get_class_name(bean):
+  if not config.has_option(bean, 'inherit'):
+    return config.get(bean,'class')
+  if config.has_option(bean, 'class'):
+    return config.get(bean,'class')
+  return get_class_name(config.get(bean,'inherit'))
+  
+def get_class(idu):
+  if idu in loader_classes: 
+    logging.debug('Loading Cached Object ' + idu)
+    return loader_classes[idu]
+
+  bean = config.items(idu)
+  name = 'greenstation.'+get_class_name(idu)
+  obj = load_obj(name)
+  logging.debug('Created Object %s' % name)
+
+  #inherited
+  # to do this correctly we really want to roll up
+  # and not down. This works for now.
+  cur = idu
+  while(config.has_option(cur,'inherit')):
+    cur = config.get(idu,'inherit')
+    for (skey,svalue) in config.items(cur):
+      set_args(obj,skey,svalue)
+  
+  for (key,value) in bean:
+    if key == 'class' or key == 'inherit':
+      continue
+    else:
+      set_args(obj,key,value)
 
   return obj
 
