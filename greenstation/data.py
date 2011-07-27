@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 
-import sqlite3
+#import sqlite3
 import time
 from xml.dom.minidom import Document
 
 class AbstractDataHandler():
+
+  transports = None
 
   def __init__(self):
     pass
@@ -12,6 +14,11 @@ class AbstractDataHandler():
   def render_data(self,sensors):
     pass
 
+  def transport_data(self,payload):
+    if self.transports != None:
+      for t in self.transports:
+        t.send_package(payload)
+        
 """class SQLiteDataHandler(AbstractDataHandler):
   
   def __init__(self):
@@ -55,14 +62,16 @@ class GreenOvenDataHandler(AbstractDataHandler):
     doc = Document()
     root = doc.createElement('GreenData')
 
+    pack = doc.createElement('package')
+
     ts = doc.createElement('timestamp')
     ts.setAttribute('zone','UTC')
     ts.appendChild(doc.createTextNode(str(time.time())))
 
-    sens = doc.createElement('Sensors')
+    sens = doc.createElement('sensors')
 
     for s in sensors:
-      senNode = doc.createElement('Sensor')
+      senNode = doc.createElement('sensor')
 
       did = doc.createElement('id')
       dtype = doc.createElement('type')
@@ -80,10 +89,12 @@ class GreenOvenDataHandler(AbstractDataHandler):
       senNode.appendChild(ddata)
       sens.appendChild(senNode)
 
-    root.appendChild(ts)
-    root.appendChild(sens)
+    pack.appendChild(ts)
+    pack.appendChild(sens)
+    root.appendChild(pack)
     doc.appendChild(root)
-    print doc.toprettyxml(indent=' ')
+    self.transport_data(doc.toxml())
+    return doc.toxml()
 
 class WaterMLDataHandler(AbstractDataHandler):
  

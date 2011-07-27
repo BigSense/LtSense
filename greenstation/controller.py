@@ -9,6 +9,7 @@ class AbstractController(Thread):
   sampleRate = 10.0
   dataHandlers = None
   sensorHandlers = None
+  transports = None
   
   def __init__(self):
     Thread.__init__(self)
