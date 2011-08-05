@@ -5,41 +5,45 @@ import logging
 import fcntl, socket, struct
 
 
-class AbstractSensor:
+class AbstractSensor(object):
 
   def __init__(self):
-     pass
-
-  id = 'Unimplemented'
-  type = 'Unimplemented'
-  data = 'Unimplemented'
-  units = 'Unimplemented'
+    object.__init__(self)
+    self.id = 'Unimplemented'
+    self.type = 'Unimplemented'
+    self.data = 'Unimplemented'
+    self.units = 'Unimplemented'
 
 
 class AbstractOWFSSensor(AbstractSensor):
+
 
   def __init__(self,uid,dataFile):
     AbstractSensor.__init__(self)
     self.id = uid
     self.dataFile = dataFile
   
-  @property
-  def data(self):
+  def _read_data(self):
     f = open(self.dataFile,'r')
     data = f.read()
     f.close()
-    return data; 
+    return data
     
+  data = property(_read_data,lambda self,v:None )
 
 class TemperatureSensor(AbstractOWFSSensor):
 
-  type = "Temperature"
-  units = "C"
+  def __init__(self,uid,dataFile):
+    AbstractOWFSSensor.__init__(self,uid,dataFile)
+    self.type = "Temperature"
+    self.units = "C"
 
 class CountingSensor(AbstractOWFSSensor):
   
-  type = "Counter"
-  units = "rev"
+  def __init__(self,uid,dataFile):
+    AbstractOWFSSensor.__init__(self,uid,dataFile)
+    self.type = "Counter"
+    self.units = "rev"
 
 class AbstractSensorHandler:
 
@@ -54,8 +58,7 @@ class OneWireSensorHandler(AbstractSensorHandler):
 
   def __init__(self):
     AbstractSensorHandler.__init__(self)
-
-  owfsMount = None  
+    self.owfsMount = None  
 
   def get_sensors(self):
     path = os.listdir(self.owfsMount)
@@ -87,7 +90,7 @@ class GeneralSensorHandler(AbstractSensorHandler):
   def get_sensors(self):
     return self.__sensors
 
-
+"""
 class MacAddressIdentificationSensor(AbstractSensor):
 
   def __init__(self):
@@ -114,7 +117,7 @@ class MacAddressIdentificationSensor(AbstractSensor):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     info = fcntl.ioctl(s.fileno(), 0x8927,  struct.pack('256s', self.__adapter[:15]))
     return ''.join(['%02x:' % ord(char) for char in info[18:24]])[:-1]
-
+"""
 
 
 class StaticInformationSensor(AbstractSensor):

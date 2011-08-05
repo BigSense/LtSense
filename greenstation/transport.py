@@ -16,11 +16,12 @@ class AbstractTransport:
 
 class QueuedHttpPostTransport(AbstractTransport,Thread):
   
-  __queue = None
-  pause_rate = 0.010
-  url = None
-
   def __init__(self):
+
+    self.__queue = None
+    self.pause_rate = 0.010
+    self.url = None
+
     AbstractTransport.__init__(self)
     Thread.__init__(self)
     self.__queue = Queue()

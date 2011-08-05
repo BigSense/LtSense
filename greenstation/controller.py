@@ -5,15 +5,15 @@ from threading import Thread
 import time
 
 class AbstractController(Thread):
-  
-  sampleRate = 10.0
-  dataHandlers = None
-  sensorHandlers = None
-  transports = None
-  
+ 
   def __init__(self):
     Thread.__init__(self)
     
+    self.sampleRate = 10.0
+    self.dataHandlers = None
+    self.sensorHandlers = None
+    self.transports = None
+  
     self.sensorHandlers = []
     self.dataHandlers = []
     self.start()

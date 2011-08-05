@@ -6,6 +6,7 @@ config = ConfigParser.RawConfigParser()
 #remove case insensitivity
 config.optionxform = lambda option: option
 
+#object cache
 loader_classes = {}
 
 #Taken from 
@@ -59,9 +60,10 @@ def get_class(idu):
   # and not down. This works for now.
   cur = idu
   while(config.has_option(cur,'inherit')):
-    cur = config.get(idu,'inherit')
+    cur = config.get(cur,'inherit')
     for (skey,svalue) in config.items(cur):
-      set_args(obj,skey,svalue)
+      if skey != 'class' and skey != 'inherit':
+        set_args(obj,skey,svalue)
   
   for (key,value) in bean:
     if key == 'class' or key == 'inherit':
@@ -69,6 +71,7 @@ def get_class(idu):
     else:
       set_args(obj,key,value)
 
+  loader_classes[idu] = obj
   return obj
 
 

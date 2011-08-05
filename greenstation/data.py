@@ -3,14 +3,15 @@
 #import sqlite3
 import time
 from xml.dom.minidom import Document
+import fcntl, socket, struct 
 
 class AbstractDataHandler():
 
-  transports = None
-
   def __init__(self):
-    pass
-    
+    self.transports = None
+    #Network Adapter for uniqueIds
+    self.adapter = 'eth0'
+
   def render_data(self,sensors):
     pass
 
@@ -18,7 +19,15 @@ class AbstractDataHandler():
     if self.transports != None:
       for t in self.transports:
         t.send_package(payload)
-        
+   
+  #Taken from http://stackoverflow.com/questions/159137/getting-mac-address
+  @property
+  def unique_id(self):
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    info = fcntl.ioctl(s.fileno(), 0x8927,  struct.pack('256s', self.adapter[:15]))
+    return ''.join(['%02x:' % ord(char) for char in info[18:24]])[:-1]
+
+       
 """class SQLiteDataHandler(AbstractDataHandler):
   
   def __init__(self):
@@ -63,33 +72,26 @@ class GreenOvenDataHandler(AbstractDataHandler):
     root = doc.createElement('GreenData')
 
     pack = doc.createElement('package')
-
-    ts = doc.createElement('timestamp')
-    ts.setAttribute('zone','UTC')
-    ts.appendChild(doc.createTextNode(str(time.time())))
+    pack.setAttribute("timestamp", str(time.time()))
+    pack.setAttribute("timezone", "UTC")
+    pack.setAttribute("id",self.unique_id)
 
     sens = doc.createElement('sensors')
 
     for s in sensors:
       senNode = doc.createElement('sensor')
 
-      did = doc.createElement('id')
-      dtype = doc.createElement('type')
-      dunits = doc.createElement('units')
-      ddata = doc.createElement('data')
+      senNode = doc.createElement('sensor')
+      senNode.setAttribute('id',s.id)
+      senNode.setAttribute('type',s.type)
+      senNode.setAttribute('units',s.units)
 
-      did.appendChild(doc.createTextNode(s.id))
-      dtype.appendChild(doc.createTextNode(s.type))
-      dunits.appendChild(doc.createTextNode(s.units))
+      ddata = doc.createElement('data')
       ddata.appendChild(doc.createTextNode(s.data))
  
-      senNode.appendChild(did)
-      senNode.appendChild(dtype)
-      senNode.appendChild(dunits)
       senNode.appendChild(ddata)
       sens.appendChild(senNode)
 
-    pack.appendChild(ts)
     pack.appendChild(sens)
     root.appendChild(pack)
     doc.appendChild(root)
