@@ -72,7 +72,9 @@ class GreenOvenDataHandler(AbstractDataHandler):
     root = doc.createElement('GreenData')
 
     pack = doc.createElement('package')
-    pack.setAttribute("timestamp", str(time.time()))
+    #Webservice expects time as a long in miliseconds. 
+    #time.time() is seconds as a float
+    pack.setAttribute("timestamp", "%d" % round(time.time()* 1000) )
     pack.setAttribute("timezone", "UTC")
     pack.setAttribute("id",self.unique_id)
 
