@@ -27,8 +27,8 @@ class AbstractDataHandler():
     info = fcntl.ioctl(s.fileno(), 0x8927,  struct.pack('256s', self.adapter[:15]))
     return ''.join(['%02x:' % ord(char) for char in info[18:24]])[:-1]
 
-       
-"""class SQLiteDataHandler(AbstractDataHandler):
+"""       
+class SQLiteDataHandler(AbstractDataHandler):
   
   def __init__(self):
     AbstractDataHandler.__init__(self)   
@@ -61,6 +61,7 @@ class AbstractDataHandler():
         )
       self.__conn.commit()
 """
+
 class GreenOvenDataHandler(AbstractDataHandler):
 
   def __init__(self):

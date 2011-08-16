@@ -7,13 +7,21 @@ import urllib2
 import logging
 import sys
 
-class AbstractTransport:
+class AbstractTransport(object):
   
   def __init__(self):
-    pass
+    object.__init__(self)
+    self._security = None
   
   def send_package(self,payload):
     pass
+  
+  def _init_security(self,security):
+    self._security = security
+    security.initalize_security()
+    
+  security = property(lambda self : self._security,lambda self,value:self._init_security(value) )
+  
 
 
 class QueuedHttpPostTransport(AbstractTransport,Thread):
@@ -33,6 +41,9 @@ class QueuedHttpPostTransport(AbstractTransport,Thread):
     while(True):
       payload = self.__queue.get()
       try:
+        if self.security != None:
+          pass
+          
         response = urllib2.urlopen(self.url,payload)
         time.sleep(float(self.pause_rate))
       except (urllib2.HTTPError,urllib2.URLError) as err:
