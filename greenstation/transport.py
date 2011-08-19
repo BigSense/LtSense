@@ -43,8 +43,11 @@ class QueuedHttpPostTransport(AbstractTransport,Thread):
       try:
         if self.security != None:
           pass
-          
+
+        logging.debug('Preparing payload for transport %s' % payload)
         response = urllib2.urlopen(self.url,payload)
+        logging.debug('Payload transported')
+
         time.sleep(float(self.pause_rate))
       except (urllib2.HTTPError,urllib2.URLError) as err:
         msg = err.code if isinstance(err,urllib2.HTTPError) else err.reason

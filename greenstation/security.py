@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+"""
 from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA
 from os import path
@@ -67,3 +67,4 @@ class SignatureSecurity(AbstractSecurity):
       digest = SHA.new(data).digest()
       return self.__private_key.sign(digest, None)
     return ''
+"""
