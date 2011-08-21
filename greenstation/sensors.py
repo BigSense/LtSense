@@ -45,13 +45,11 @@ class CountingSensor(AbstractOWFSSensor):
     self.type = "Counter"
     self.units = "rev"
 
-class AbstractSensorHandler:
+class AbstractSensorHandler(object):
 
   def __init__(self):
-    pass
-
-  def get_sensors(self):
-    pass
+    object.__init__(self)
+    self.sensors = []
 
 
 class OneWireSensorHandler(AbstractSensorHandler):
@@ -59,8 +57,8 @@ class OneWireSensorHandler(AbstractSensorHandler):
   def __init__(self):
     AbstractSensorHandler.__init__(self)
     self.owfsMount = None  
-
-  def get_sensors(self):
+  
+  def _get_sensors():
     path = os.listdir(self.owfsMount)
     ret = []
     for p in path:
@@ -74,21 +72,15 @@ class OneWireSensorHandler(AbstractSensorHandler):
     
     return ret
 
+  sensors = property(_get_sensors,lambda self,v:None )
  
 class GeneralSensorHandler(AbstractSensorHandler):
   
   def __init__(self):
     AbstractSensorHandler.__init__(self)
-    self.__sensors = []
-
-  def set_sensors(self,sensors):
-    self.__sensors = sensors
 
   def add_sensors(self,sensors):
-    self.__sensors.extend(sensors)
-  
-  def get_sensors(self):
-    return self.__sensors
+    self.sensors.append(sensors)
 
 """
 class MacAddressIdentificationSensor(AbstractSensor):

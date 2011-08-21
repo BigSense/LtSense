@@ -27,7 +27,7 @@ class AbstractController(Thread):
     if self.sensorHandlers != None:
       sensors = []
       for h in self.sensorHandlers:        
-        sensors.extend( h.get_sensors() )
+        sensors.extend( h.sensors )
       if self.dataHandlers != None:
         for d in self.dataHandlers:
           d.render_data(sensors)
