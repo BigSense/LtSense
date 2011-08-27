@@ -58,7 +58,7 @@ class OneWireSensorHandler(AbstractSensorHandler):
     AbstractSensorHandler.__init__(self)
     self.owfsMount = None  
   
-  def _get_sensors():
+  def _get_sensors(self):
     path = os.listdir(self.owfsMount)
     ret = []
     for p in path:
