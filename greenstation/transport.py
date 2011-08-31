@@ -11,17 +11,9 @@ class AbstractTransport(object):
   
   def __init__(self):
     object.__init__(self)
-    self._security = None
   
   def send_package(self,payload):
     pass
-  
-  def _init_security(self,security):
-    self._security = security
-    security.initalize_security()
-    
-  security = property(lambda self : self._security,lambda self,value:self._init_security(value) )
-  
 
 
 class QueuedHttpPostTransport(AbstractTransport,Thread):
@@ -29,7 +21,8 @@ class QueuedHttpPostTransport(AbstractTransport,Thread):
   def __init__(self):
 
     self.__queue = None
-    self.pause_rate = 0.010
+    self.pause_rate = 0.10
+    self.timeout = 10.0
     self.url = None
 
     AbstractTransport.__init__(self)
@@ -41,8 +34,6 @@ class QueuedHttpPostTransport(AbstractTransport,Thread):
     while(True):
       payload = self.__queue.get()
       try:
-        if self.security != None:
-          pass
 
         logging.debug('Preparing payload for transport %s' % payload)
         response = urllib2.urlopen(self.url,payload)
@@ -51,11 +42,13 @@ class QueuedHttpPostTransport(AbstractTransport,Thread):
         time.sleep(float(self.pause_rate))
       except (urllib2.HTTPError,urllib2.URLError) as err:
         msg = err.code if isinstance(err,urllib2.HTTPError) else err.reason
-        logging.warn('Error delivering payload: %s. Requeueing (Queue Size:%d)' % (msg,self.__queue.qsize()))
+        logging.warn('Error delivering payload: %s. Requeueing (Queue Size:%d). Retry in %d' % (msg,self.__queue.qsize(),self.timeout))
         self.__queue.put(payload)
+        time.sleep(float(self.timeout))
       except:
-        logging.error('Unknown exception %s. Requeueing (Queue Size:%d)' % (sys.exc_info()[0],self.__queue.qsize()))
+        logging.error('Unknown exception %s. Requeueing (Queue Size:%d). Retry in %d' % (sys.exc_info()[0],self.__queue.qsize(),self.timeout))
         self.__queue.put(payload)
+        time.sleep(float(self.timeout))
 
   def send_package(self,payload):
     self.__queue.put(payload)

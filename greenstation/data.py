@@ -5,15 +5,22 @@ import time
 from xml.dom.minidom import Document
 import fcntl, socket, struct 
 
-class AbstractDataHandler():
+class AbstractDataHandler(object):
 
   def __init__(self):
+    object.__init__(self)
     self.transports = None
     #Network Adapter for uniqueIds
     self.adapter = 'eth0'
 
   def render_data(self,sensors):
     pass
+    
+  def _init_security(self,security):
+    self._security = security
+    security.initalize_security()
+
+  security = property(lambda self : self._security,lambda self,value:self._init_security(value) )    
 
   def transport_data(self,payload):
     if self.transports != None:
@@ -96,7 +103,16 @@ class GreenOvenDataHandler(AbstractDataHandler):
       sens.appendChild(senNode)
 
     pack.appendChild(sens)
-    root.appendChild(pack)
+    
+    if self.security != None:
+      signature = self.security.sign_data(pack.toxml())
+      sig = doc.createElement('signature')
+      sig.appendChild(doc.createTextNode(signature))
+      root.appendChild(pack)
+      root.appendChild(sig)
+    else:
+      root.appendChild(pack)
+      
     doc.appendChild(root)
     self.transport_data(doc.toxml())
     return doc.toxml()

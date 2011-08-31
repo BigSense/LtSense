@@ -1,12 +1,12 @@
 #!/usr/bin/env python
-"""
+
 from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA
 from os import path
 from os import urandom
 import logging
 
-class AbstractSecurity(object):
+class DataSecurity(object):
   
   def __init__(self):
     object.__init__(self)
@@ -21,10 +21,10 @@ class AbstractSecurity(object):
   def encrypt_data(self,data):
     return 'Unimplemented'
 
-class SignatureSecurity(AbstractSecurity):
+class SignatureSecurity(DataSecurity):
 
   def __init__(self):
-    AbstractSecurity.__init__(self)
+    DataSecurity.__init__(self)
     self.ready = False
     self.privateKeyFile = 'key'
     self.publicKeyFile = 'key.pub'
@@ -41,18 +41,20 @@ class SignatureSecurity(AbstractSecurity):
 
         if path.isfile(priPath) and path.isfile(pubPath): 
           logging.info("Loading existing keys from %s. Public: %s / Private: %s" % (self.dataDir,self.publicKeyFile,self.privateKeyFile))
-          self.__private_key = RSA.importKey(priPath)
+          with open(priPath,'r') as fpri:
+            self.__private_key = fpri.read()
           with open(pubPath,'r') as fpub:
             self.__public_key = fpub.read()
+          self.__key = RSA.importKey(self.__private_key)
           self.ready = True
         else:
           logging.info("No keys found. Generating New Keys")
           # private_key is a string suitable for storing on disk for retrieval later
           # public_key is a string suitable for sending to the server
           # The server should store this along with the client ID for verification
-          key = RSA.generate(self.keySize,urandom)
-          self.__private_key = key.exportKey()
-          self.__public_key = key.publickey().exportKey()
+          self.__key = RSA.generate(self.keySize,urandom)
+          self.__private_key = self.__key.exportKey()
+          self.__public_key = self.__key.publickey().exportKey()
           with open(pubPath,'w') as fpub:
             logging.info("Writing Public Key to %s" % pubPath)
             fpub.write(self.__public_key)
@@ -65,6 +67,6 @@ class SignatureSecurity(AbstractSecurity):
   def sign_data(self,data):
     if self.ready == True:
       digest = SHA.new(data).digest()
-      return self.__private_key.sign(digest, None)
+      return str(self.__key.sign(digest, None)[0])
     return ''
-"""
+
