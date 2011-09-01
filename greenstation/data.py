@@ -10,6 +10,7 @@ class AbstractDataHandler(object):
   def __init__(self):
     object.__init__(self)
     self.transports = None
+    self.identifier = None 
     #Network Adapter for uniqueIds
     self.adapter = 'eth0'
 
@@ -28,11 +29,11 @@ class AbstractDataHandler(object):
         t.send_package(payload)
    
   #Taken from http://stackoverflow.com/questions/159137/getting-mac-address
-  @property
+  """"@property
   def unique_id(self):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     info = fcntl.ioctl(s.fileno(), 0x8927,  struct.pack('256s', self.adapter[:15]))
-    return ''.join(['%02x:' % ord(char) for char in info[18:24]])[:-1]
+    return ''.join(['%02x:' % ord(char) for char in info[18:24]])[:-1]"""
 
 """       
 class SQLiteDataHandler(AbstractDataHandler):
@@ -84,7 +85,7 @@ class GreenOvenDataHandler(AbstractDataHandler):
     #time.time() is seconds as a float
     pack.setAttribute("timestamp", "%d" % round(time.time()* 1000) )
     pack.setAttribute("timezone", "UTC")
-    pack.setAttribute("id",self.unique_id)
+    pack.setAttribute("id",self.identifier.identify())
 
     sens = doc.createElement('sensors')
 
@@ -104,6 +105,7 @@ class GreenOvenDataHandler(AbstractDataHandler):
 
     pack.appendChild(sens)
     
+    #Data Signature
     if self.security != None:
       signature = self.security.sign_data(pack.toxml())
       sig = doc.createElement('signature')
