@@ -13,6 +13,7 @@ class AbstractDataHandler(object):
     self.identifier = None 
     #Network Adapter for uniqueIds
     self.adapter = 'eth0'
+    self._security = None
 
   def render_data(self,sensors):
     pass
