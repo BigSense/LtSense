@@ -42,11 +42,11 @@ class QueuedHttpPostTransport(AbstractTransport,Thread):
         time.sleep(float(self.pause_rate))
       except (urllib2.HTTPError,urllib2.URLError) as err:
         msg = err.code if isinstance(err,urllib2.HTTPError) else err.reason
-        logging.warn('Error delivering payload: %s. Requeueing (Queue Size:%d). Retry in %d' % (msg,self.__queue.qsize(),self.timeout))
+        logging.warn('Error delivering payload: %s. Requeueing (Queue Size:%s). Retry in %s' % (msg,self.__queue.qsize(),self.timeout))
         self.__queue.put(payload)
         time.sleep(float(self.timeout))
       except:
-        logging.error('Unknown exception %s. Requeueing (Queue Size:%d). Retry in %d' % (sys.exc_info()[0],self.__queue.qsize(),self.timeout))
+        logging.error('Unknown exception %s. Requeueing (Queue Size:%s). Retry in %s' % (sys.exc_info()[0],self.__queue.qsize(),self.timeout))
         self.__queue.put(payload)
         time.sleep(float(self.timeout))
 
