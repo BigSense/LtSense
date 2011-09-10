@@ -4,6 +4,7 @@ import os
 import logging
 import fcntl, socket, struct
 import time
+import loader
 
 
 class AbstractSensor(object):
@@ -49,27 +50,38 @@ class CountingSensor(AbstractOWFSSensor):
 class RainBucketSensor(AbstractOWFSSensor):
   
   def __init__(self,):
-    AbstractOWFSSensor.__init(self,None,None)
+    AbstractOWFSSensor.__init__(self,None,None)
     self.type = "FlowRate"
-    self.units = "Undefined"
+    self._units = "Undefined"
     self.bucket_volume = float(0)
     self._time_stamp = float(0)
-    
-  data = property(_read_bucket_data,lambda self,v:None )
+    self._count = None
   
   def _read_bucket_data(self):
+    
+    #first time, initalize to zero
+    if self._count == None:
+      self._count = float(self._read_data())
+      self._time_stamp = time.time()
+      return str(0)
+    
     #Time duration 
     now = float(time.time())
     ptime = float(now - self._time_stamp)
     self._time_stamp = now
     
-    vol = float(AbstractOWFSSensor.data) * float(self.bucket_volume)
+    cur = float(self._read_data()) 
+    delta = cur - float(self._count)
+    self._count = cur 
+    
+    vol = delta * float(self.bucket_volume)
     
     # returns units per second
-    return vol / ptime 
-    
-        
-    
+    return str( (vol / ptime) ) 
+  
+  data = property(_read_bucket_data,lambda self,v:None )
+  
+  units = property(lambda self: ('%s/s' % self._units) , lambda self,v: setattr(self,'_units',v) )  
   
 
 class AbstractSensorHandler(object):
@@ -94,8 +106,8 @@ class OneWireSensorHandler(AbstractSensorHandler):
          tfile = os.path.join(os.path.join(self.owfsMount,p),'temperature')
          ret.append( TemperatureSensor(ext.lstrip('.'),tfile) )
        if name == '1D':
-         tfile =  os.path.join(os.path.join(self.owfsMount,p),'counters.ALL')
-         bucket = greenstation.loader.get_class('RainBucketSensor')
+         tfile =  os.path.join(os.path.join(self.owfsMount,p),'counters.A')
+         bucket = loader.get_class('RainBucketSensor')
          bucket.dataFile = tfile
          bucket.id = ext.lstrip('.')
          ret.append(bucket)         
