@@ -3,6 +3,7 @@
 import os
 import logging
 import fcntl, socket, struct
+import time
 
 
 class AbstractSensor(object):
@@ -44,6 +45,32 @@ class CountingSensor(AbstractOWFSSensor):
     AbstractOWFSSensor.__init__(self,uid,dataFile)
     self.type = "Counter"
     self.units = "rev"
+    
+class RainBucketSensor(AbstractOWFSSensor):
+  
+  def __init__(self,):
+    AbstractOWFSSensor.__init(self,None,None)
+    self.type = "FlowRate"
+    self.units = "Undefined"
+    self.bucket_volume = float(0)
+    self._time_stamp = float(0)
+    
+  data = property(_read_bucket_data,lambda self,v:None )
+  
+  def _read_bucket_data(self):
+    #Time duration 
+    now = float(time.time())
+    ptime = float(now - self._time_stamp)
+    self._time_stamp = now
+    
+    vol = float(AbstractOWFSSensor.data) * float(self.bucket_volume)
+    
+    # returns units per second
+    return vol / ptime 
+    
+        
+    
+  
 
 class AbstractSensorHandler(object):
 
@@ -68,7 +95,11 @@ class OneWireSensorHandler(AbstractSensorHandler):
          ret.append( TemperatureSensor(ext.lstrip('.'),tfile) )
        if name == '1D':
          tfile =  os.path.join(os.path.join(self.owfsMount,p),'counters.ALL')
-         ret.append( CountingSensor(ext.lstrip('.'),tfile) )
+         bucket = greenstation.loader.get_class('RainBucketSensor')
+         bucket.dataFile = tfile
+         bucket.id = ext.lstrip('.')
+         ret.append(bucket)         
+         #ret.append( CountingSensor(ext.lstrip('.'),tfile) )
     
     return ret
 
