@@ -3,6 +3,7 @@
 from sensors import OneWireSensorHandler
 from threading import Thread
 import time
+import greenstation
 
 class AbstractController(Thread):
  
@@ -19,9 +20,10 @@ class AbstractController(Thread):
     self.start()
 
   def run(self):
-    while True:
+    while not greenstation.exit_all_threads:
       self.process_sensor_data()
       time.sleep(float(self.sampleRate))
+    logging.info('Exit Detected. Stopping Controller Thread')
 
   def process_sensor_data(self):
     if self.sensorHandlers != None:

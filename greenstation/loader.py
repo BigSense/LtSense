@@ -45,8 +45,8 @@ def get_class_name(bean):
     return config.get(bean,'class')
   return get_class_name(config.get(bean,'inherit'))
   
-def get_class(idu):
-  if idu in loader_classes: 
+def get_class(idu,prototype=False):
+  if idu in loader_classes and prototype == False: 
     logging.debug('Loading Cached Object ' + idu)
     return loader_classes[idu]
 
@@ -71,7 +71,12 @@ def get_class(idu):
     else:
       set_args(obj,key,value)
 
-  loader_classes[idu] = obj
+  if prototype == False:
+    logging.debug("Caching Singleton object " + idu)
+    loader_classes[idu] = obj
+  else:
+    logging.debug("Prototype request. Returing new instance " + idu)
+
   return obj
 
 

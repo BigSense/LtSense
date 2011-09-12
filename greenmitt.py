@@ -4,8 +4,20 @@ from optparse import OptionParser,OptionGroup
 import sys
 import logging 
 import greenstation.loader
+import greenstation
 import datetime
+import signal
 from os.path import basename
+
+
+#exit program signal
+def signal_break_handler(signal, frame):
+  print 'Interurpt Detected. Killing threads'
+  greenstation.exit_all_threads = True
+  sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_break_handler)
+
 
 def logfile_arg():
    def func(option,opt_str,value,parser):
@@ -51,3 +63,6 @@ if __name__ == '__main__':
   
    greenstation.loader.load_config(options.config)
    controller = greenstation.loader.get_class('Controller')
+   #pause for Ctrl+C Signal Handler
+   signal.pause()
+   

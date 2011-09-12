@@ -88,28 +88,36 @@ class AbstractSensorHandler(object):
 
   def __init__(self):
     object.__init__(self)
-    self.sensors = []
+    self.sensors = {} 
 
 
 class OneWireSensorHandler(AbstractSensorHandler):
 
   def __init__(self):
     AbstractSensorHandler.__init__(self)
-    self.owfsMount = None  
+    self.owfsMount = None 
+    self.counters = {} 
   
   def _get_sensors(self):
     path = os.listdir(self.owfsMount)
     ret = []
     for p in path:
        (name,ext) = (os.path.splitext(p))
+       sensor_id = ext.lstrip('.')
        if name == '10':
          tfile = os.path.join(os.path.join(self.owfsMount,p),'temperature')
-         ret.append( TemperatureSensor(ext.lstrip('.'),tfile) )
+         ret.append( TemperatureSensor(sensor_id,tfile) )
        if name == '1D':
-         tfile =  os.path.join(os.path.join(self.owfsMount,p),'counters.A')
-         bucket = loader.get_class('RainBucketSensor')
-         bucket.dataFile = tfile
-         bucket.id = ext.lstrip('.')
+         bucket = None
+         if sensor_id in self.counters:
+           bucket = self.counters[sensor_id]
+         else:           
+           tfile =  os.path.join(os.path.join(self.owfsMount,p),'counters.A')
+           bucket = loader.get_class('RainBucketSensor',True)
+           bucket.dataFile = tfile
+           bucket.id = sensor_id
+           self.counters[sensor_id] = bucket
+         
          ret.append(bucket)         
          #ret.append( CountingSensor(ext.lstrip('.'),tfile) )
     
