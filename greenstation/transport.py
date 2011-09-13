@@ -7,6 +7,7 @@ import urllib2
 import logging
 import sys
 import greenstation
+import logging
 
 class AbstractTransport(object):
   
@@ -44,9 +45,9 @@ class QueuedHttpPostTransport(AbstractTransport,Thread):
         contine 
         
       try:
-        logging.debug('Preparing payload for transport %s' % payload)
+        logging.debug('Preparing payload for transport')
         response = urllib2.urlopen(self.url,payload)
-        logging.debug('Payload transported')
+        logging.debug('Payload transported. (Queue Size: %s)' % self.__queue.qsize())
 
         time.sleep(float(self.pause_rate))
       except (urllib2.HTTPError,urllib2.URLError) as err:

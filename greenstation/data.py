@@ -4,6 +4,7 @@
 import time
 from xml.dom.minidom import Document
 import fcntl, socket, struct 
+import logging
 
 class AbstractDataHandler(object):
 
@@ -29,12 +30,6 @@ class AbstractDataHandler(object):
       for t in self.transports:
         t.send_package(payload)
    
-  #Taken from http://stackoverflow.com/questions/159137/getting-mac-address
-  """"@property
-  def unique_id(self):
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    info = fcntl.ioctl(s.fileno(), 0x8927,  struct.pack('256s', self.adapter[:15]))
-    return ''.join(['%02x:' % ord(char) for char in info[18:24]])[:-1]"""
 
 """       
 class SQLiteDataHandler(AbstractDataHandler):
@@ -117,14 +112,9 @@ class GreenOvenDataHandler(AbstractDataHandler):
       root.appendChild(pack)
       
     doc.appendChild(root)
+    logging.debug('Generated XML\n' + doc.toprettyxml())
     self.transport_data(doc.toxml())
     return doc.toxml()
 
-class WaterMLDataHandler(AbstractDataHandler):
- 
-  def __init__(self,conifg):
-    AbstractDataHandler.__init__(self,config)
-    
-  def render_data(self,sensors):
-    pass
+
 

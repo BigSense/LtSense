@@ -40,16 +40,36 @@ class TemperatureSensor(AbstractOWFSSensor):
     self.type = "Temperature"
     self.units = "C"
 
-class CountingSensor(AbstractOWFSSensor):
+class FluidVolumeSensor(AbstractOWFSSensor):
   
-  def __init__(self,uid,dataFile):
-    AbstractOWFSSensor.__init__(self,uid,dataFile)
-    self.type = "Counter"
-    self.units = "rev"
+  def __init__(self):
+    AbstractOWFSSensor.__init__(self,None,None)
+    self.type = "Volume"
+    self.units = "Undefined"
+    self.bucket_volume = float(0)
+    self.reset_on_startup = False
+    self.__initial_count = -1
+
+  def _read_bucket_data(self):
     
-class RainBucketSensor(AbstractOWFSSensor):
+    if self.__initial_count == -1:
+      if self.reset_on_startup == True:
+        self.__initial_count = self._read_data()
+        logging.debug('Counter Initially Set to %s (Volume: %s %s)' % (self.__initial_count, (float(self.__initial_count) * float(self.bucket_volume)), self.units))
+        return str(0.0)
+      else:
+        logging.debug('Counter Reset Set to False')
+        self.__initial_count = 0
+    
+    cur = int(self._read_data()) - int(self.__initial_count)
+    return str(  float(cur) * float(self.bucket_volume) )
+
+  data = property(_read_bucket_data,lambda self,v:None )
   
-  def __init__(self,):
+    
+class FlowRateSensor(AbstractOWFSSensor):
+  
+  def __init__(self):
     AbstractOWFSSensor.__init__(self,None,None)
     self.type = "FlowRate"
     self._units = "Undefined"
@@ -97,41 +117,37 @@ class OneWireSensorHandler(AbstractSensorHandler):
     AbstractSensorHandler.__init__(self)
     self.owfsMount = None 
     self.counters = {} 
-  
-  def _get_sensors(self):
+    self.__sensor_cache = {} 
+
+  def __load_multi_cached_sensor(self,id,file,objname):
+    if id not in self.__sensor_cache:
+      sbuild = loader.get_class(objname,True)
+      sbuild.dataFile = file
+      sbuild.id = id
+      self.__sensor_cache[id] = sbuild
+    return self.__sensor_cache[id]    
+ 
+  def __get_sensors(self):
     path = os.listdir(self.owfsMount)
     ret = []
     for p in path:
        (name,ext) = (os.path.splitext(p))
        sensor_id = ext.lstrip('.')
        if name == '10':
-         tfile = os.path.join(os.path.join(self.owfsMount,p),'temperature')
-         ret.append( TemperatureSensor(sensor_id,tfile) )
+         if sensor_id not in self.__sensor_cache: 
+           tfile = os.path.join(os.path.join(self.owfsMount,p),'temperature')
+           self.__sensor_cache[sensor_id] = TemperatureSensor(sensor_id,tfile)
+         ret.append( self.__sensor_cache[sensor_id] )
        if name == '1D':
-         bucket = None
-         cfiles = [ 'counters.A' ]
-         logging.debug( 'Dual?' + loader.get_class('RainBucketSensor',False).dual + '--')
-         if str.lower(loader.get_class('RainBucketSensor',False).dual) == 'true':
-            logging.debug('---counterB')
-            cfiles.append('counters.B')
 
-         for i in cfiles:
-            ind_id = sensor_id + i # sensor.id + counter.{A,B}
-            if ind_id in self.counters:
-             bucket = self.counters[ind_id]
-            else:
-             bucket = loader.get_class('RainBucketSensor',True)
-             tfile =  os.path.join(os.path.join(self.owfsMount,p),i)
-             bucket.dataFile = tfile
-             bucket.id = ind_id
-             self.counters[ind_id] = bucket
+         tfile =  os.path.join(os.path.join(self.owfsMount,p),'counters.A')
          
-            ret.append(bucket)         
-         #ret.append( CountingSensor(ext.lstrip('.'),tfile) )
+         ret.append(self.__load_multi_cached_sensor(sensor_id + '-V',tfile,'FluidVolumeSensor'))
+         ret.append(self.__load_multi_cached_sensor(sensor_id + '-FR',tfile,'FlowRateSensor'))
     
     return ret
 
-  sensors = property(_get_sensors,lambda self,v:None )
+  sensors = property(__get_sensors,lambda self,v:None )
  
 class GeneralSensorHandler(AbstractSensorHandler):
   
