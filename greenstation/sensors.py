@@ -109,16 +109,24 @@ class OneWireSensorHandler(AbstractSensorHandler):
          ret.append( TemperatureSensor(sensor_id,tfile) )
        if name == '1D':
          bucket = None
-         if sensor_id in self.counters:
-           bucket = self.counters[sensor_id]
-         else:           
-           tfile =  os.path.join(os.path.join(self.owfsMount,p),'counters.A')
-           bucket = loader.get_class('RainBucketSensor',True)
-           bucket.dataFile = tfile
-           bucket.id = sensor_id
-           self.counters[sensor_id] = bucket
+         cfiles = [ 'counters.A' ]
+         logging.debug( 'Dual?' + loader.get_class('RainBucketSensor',False).dual + '--')
+         if str.lower(loader.get_class('RainBucketSensor',False).dual) == 'true':
+            logging.debug('---counterB')
+            cfiles.append('counters.B')
+
+         for i in cfiles:
+            ind_id = sensor_id + i # sensor.id + counter.{A,B}
+            if ind_id in self.counters:
+             bucket = self.counters[ind_id]
+            else:
+             bucket = loader.get_class('RainBucketSensor',True)
+             tfile =  os.path.join(os.path.join(self.owfsMount,p),i)
+             bucket.dataFile = tfile
+             bucket.id = ind_id
+             self.counters[ind_id] = bucket
          
-         ret.append(bucket)         
+            ret.append(bucket)         
          #ret.append( CountingSensor(ext.lstrip('.'),tfile) )
     
     return ret
