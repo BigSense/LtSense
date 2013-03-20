@@ -51,7 +51,7 @@ def get_class(idu,prototype=False):
     return loader_classes[idu]
 
   bean = config.items(idu)
-  name = 'greenstation.'+get_class_name(idu)
+  name = 'ltsense.'+get_class_name(idu)
   obj = load_obj(name)
   logging.debug('Created Object %s' % name)
 

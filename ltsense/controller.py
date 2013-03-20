@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
-from sensors import OneWireSensorHandler
 from threading import Thread
 import time
-import greenstation
+import ltsense
+import logging
+import sys
 
 class AbstractController(Thread):
  
@@ -17,10 +18,9 @@ class AbstractController(Thread):
   
     self.sensorHandlers = []
     self.dataHandlers = []
-    self.start()
 
   def run(self):
-    while not greenstation.exit_all_threads:
+    while not ltsense.exit_all_threads:
       self.process_sensor_data()
       time.sleep(float(self.sampleRate))
     logging.info('Exit Detected. Stopping Controller Thread')
@@ -38,10 +38,26 @@ class DefaultController(AbstractController):
 
   def __init__(self):
     AbstractController.__init__(self)
+    self.start()
     
-    #owpath = config.get('OneWire','owfsMount')
-    #if owpath == None:
-    #  raise Exception('Config','No OneWire/owfsMount defined')
-       
-    #self.sensorHandlers.append(OneWireSensorHandler(owpath))
+class RespawningController(AbstractController):
 
+  def __init__(self):
+    AbstractController.__init__(self)
+    #default, exit if we respawn more than 10
+    # times in 10 seconds
+    self.respawnRateLimit = 10
+    self.respawnTimeLimit = 10
+    self.start()
+ 
+  def run(self):
+    spawnCount = 0
+    spawnTime = int(time.time())
+
+    
+    
+    try:
+      AbstractController.run()
+    except:
+      logging.error('Main Process Loop Generated an Exception: %s' % sys.exc_info()[0])
+   

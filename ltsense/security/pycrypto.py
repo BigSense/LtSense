@@ -1,3 +1,5 @@
+__author__ = 'Sumit Khanna <sumit@penguindreams.org'
+
 #!/usr/bin/env python
 
 from Crypto.PublicKey import RSA
@@ -5,21 +7,6 @@ from Crypto.Hash import SHA
 from os import path
 from os import urandom
 import logging
-
-class DataSecurity(object):
-  
-  def __init__(self):
-    object.__init__(self)
-    self.dataDir = None
-    
-  def initalize_security(self):
-    pass
-
-  def sign_data(self,data):
-    return 'Unimplemented'
-
-  def encrypt_data(self,data):
-    return 'Unimplemented'
 
 class SignatureSecurity(DataSecurity):
 
@@ -35,11 +22,11 @@ class SignatureSecurity(DataSecurity):
       if not path.isdir(self.dataDir):
         logging.error('Security Data Directory does not exist or is not a directory: %s' % self.dataDir)
       else:
-        
+
         priPath = path.join(self.dataDir,self.privateKeyFile)
         pubPath = path.join(self.dataDir,self.publicKeyFile)
 
-        if path.isfile(priPath) and path.isfile(pubPath): 
+        if path.isfile(priPath) and path.isfile(pubPath):
           logging.info("Loading existing keys from %s. Public: %s / Private: %s" % (self.dataDir,self.publicKeyFile,self.privateKeyFile))
           with open(priPath,'r') as fpri:
             self.__private_key = fpri.read()
@@ -66,7 +53,10 @@ class SignatureSecurity(DataSecurity):
 
   def sign_data(self,data):
     if self.ready == True:
-      digest = SHA.new(data).digest()
+      logging.debug('Data to sign: "%s"' % data)
+      digest = SHA.new(data.strip()).digest()
+      logging.debug('Digest: "%s"' % repr(digest))
       return str(self.__key.sign(digest, None)[0])
     return ''
+
 

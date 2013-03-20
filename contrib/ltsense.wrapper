@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# copyright 2012 BigSense
+# @author Sumit Khanna <sumit@penguindreams.org>
+
+PYTHONPATH=/usr/lib/ltsense
+export PYTHONPATH
+/usr/lib/ltsense/ltsense.py "$@"
