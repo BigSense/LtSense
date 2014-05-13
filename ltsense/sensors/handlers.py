@@ -3,6 +3,14 @@ from ltsense.sensors import AbstractSensorHandler
 from ltsense.sensors.owproc import TemperatureSensor,WindSpeedSensor
 import logging
 from ltsense import loader
+import ow
+
+class OWFSSensorHandler(AbstractSensorHandler):
+
+  def __init__(self):
+    AbstractSensorHandler.__init__(self)
+
+
 
 class AgraNetSensorHandler(AbstractSensorHandler):
     
