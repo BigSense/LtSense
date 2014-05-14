@@ -45,7 +45,7 @@ class QueuedTransport(AbstractTransport,Thread):
       #Because of the way dependency injection works in the loader.py,
       # the queue may not be set when the thread is started on initilization, 
       # so we must way for the queue to be set.
-      if self.queue == None:
+      if self.queue is None:
         logging.info('Queue Not Initalized Yet. Waiting...')
         time.sleep(float(self.pause_rate))
         continue;
