@@ -25,7 +25,7 @@ class AbstractDataHandler(object):
   security = property(lambda self : self._security,lambda self,value:self._init_security(value) )
 
   def transport_data(self,payload):
-    if self.transports != None:
+    if self.transports is not None:
       for t in self.transports:
         t.send_package(payload)
    
@@ -36,7 +36,6 @@ class AgraDataHandler(AbstractDataHandler):
     AbstractDataHandler.__init__(self)
 
   def render_data(self,sensors):
-    now = time.time()
     doc = Document()
     root = doc.createElement('AgraData')
 
