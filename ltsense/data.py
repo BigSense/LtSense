@@ -18,19 +18,7 @@ class AbstractDataHandler(object):
   def render_data(self,sensors):
     pass
 
-  def _init_security(self,security):
-    self._security = security
-    security.initalize_security()
-
-  security = property(lambda self : self._security,lambda self,value:self._init_security(value) )
-
-  def transport_data(self,payload):
-    if self.transports is not None:
-      for t in self.transports:
-        t.send_package(payload)
-   
-
-class AgraDataHandler(AbstractDataHandler):
+class SenseDataHandler(AbstractDataHandler):
 
   def __init__(self):
     AbstractDataHandler.__init__(self)
@@ -71,12 +59,12 @@ class AgraDataHandler(AbstractDataHandler):
     
     #errors
     if len(err) > 0:
-	  errList = doc.createElement('errors')
-	  for e in err:
-		errNode = doc.createElement('error')
-		errNode.appendChild(doc.createTextNode(e))
-		errList.appendChild(errNode)
-	  pack.appendChild(errList)
+      errList = doc.createElement('errors')
+    for e in err:
+      errNode = doc.createElement('error')
+      errNode.appendChild(doc.createTextNode(e))
+      errList.appendChild(errNode)
+    pack.appendChild(errList)
     
 
     root.appendChild(pack)  
@@ -84,13 +72,8 @@ class AgraDataHandler(AbstractDataHandler):
     logging.debug('Generated XML\n' + doc.toprettyxml())
     
     #Data Signature
-    if self._security != None:
-      signature = self._security.sign_data(doc.toxml())
-      logging.info("Data Signature: " + signature)
-  
-    self.transport_data(
-      ("%s\n\n%s" % (doc.toxml(),signature)) if self.security != None else doc.toxml()
-    )
+    return doc.toxml()
+
 
 
 

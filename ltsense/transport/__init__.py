@@ -15,9 +15,22 @@ class AbstractTransport(object):
   
   def __init__(self):
     object.__init__(self)
+    self._security = None
 
   def send_package(self,payload):
-    pass
+    if self._security is not None:
+      signature = self._security.sign_data(payload)
+      logging.info("Data Signature: " + signature)
+      return "%s\n\n%s" % (payload,signature)
+    else:
+      return payload
+
+  def _init_security(self,security):
+    self._security = security
+    security.initalize_security()
+
+  security = property(lambda self : self._security,lambda self,value:self._init_security(value) )
+
 
     
 class QueuedTransport(AbstractTransport,Thread):
@@ -71,6 +84,7 @@ class QueuedTransport(AbstractTransport,Thread):
 
   def send_package(self,payload):
     """Adds the payload to the queue which is handeled by the queue thread."""
+    payload = AbstractTransport.send_package(payload)
     self.queue.enqueue(payload)
 
   def _run_transport(self,payload):

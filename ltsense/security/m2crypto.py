@@ -6,31 +6,32 @@ from os import path
 import logging
 import base64
 
-class SignatureSecurity(DataSecurity):
+class M2Security(DataSecurity):
 
   def __init__(self):
     DataSecurity.__init__(self)
     self.ready = False
-    self.keyFile = 'key.pem'
-    self.keySize = 2048
+    self.key_file = 'key.pem'
+    self.key_size = 2048
+    self._key = None
 
 
   def initalize_security(self):
-    if self.dataDir != None:
-      if not path.isdir(self.dataDir):
-        logging.error('Security Data Directory does not exist or is not a directory: %s' % self.dataDir)
+    if self.data_dir is not None:
+      if not path.isdir(self.data_dir):
+        logging.error('Security Data Directory does not exist or is not a directory: %s' % self.data_dir)
       else:
-        keyPath = path.join(self.dataDir,self.keyFile)
+        key_path = path.join(self.data_dir,self.key_file)
 
-        if path.isfile(keyPath):
-          logging.info("Loading existing keys from %s. PEM: %s" % (self.dataDir,self.keyFile))
-          self._key = EVP.load_key(keyPath)
+        if path.isfile(key_path):
+          logging.info("Loading existing keys from %s. PEM: %s" % (self.data_dir,self.key_file))
+          self._key = EVP.load_key(key_path)
           self.ready = True
         else:
           logging.info("No keys found. Generating New Keys")
           #TODO magic strings and such
-          self._key = RSA.gen_key(self.keySize, 65537)
-          self._key.save_pem(keyPath, cipher=None)
+          self._key = RSA.gen_key(self.key_size, 65537)
+          self._key.save_pem(key_path, cipher=None)
           self.ready = True
 
   def sign_data(self,data):
