@@ -10,10 +10,6 @@ class M2Security(DataSecurity):
 
   def __init__(self):
     DataSecurity.__init__(self)
-    self.ready = False
-    self.key_file = 'key.pem'
-    self.key_size = 2048
-    self._key = None
 
 
   def initalize_security(self):

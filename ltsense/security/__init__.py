@@ -6,7 +6,10 @@ class DataSecurity(object):
   def __init__(self):
     object.__init__(self)
     self.data_dir = None
-    self.site_name = 'Unknown'
+    self.ready = False
+    self.key_file = 'key.pem'
+    self.key_size = 2048
+    self._key = None
 
   def initalize_security(self):
     pass
