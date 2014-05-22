@@ -6,7 +6,7 @@ from os import path
 
 class AbstractIdentifier(object):
   
-  def AbstractIdentifier(self):
+  def __init__(self):
     object.__init__(self)
     
   def identify():
@@ -14,9 +14,9 @@ class AbstractIdentifier(object):
     
 class MacAddressIdentifier(AbstractIdentifier):
   
-  def MacAddressIdentifier(self):
+  def __init__(self,adapter = 'eth0'):
     AbstractIdentifier.__init__(self)
-    self.adapter = 'eth0'
+    self.adapter = adapter
     
   def identify(self):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -25,19 +25,21 @@ class MacAddressIdentifier(AbstractIdentifier):
 
 class NamedIdentifier(AbstractIdentifier):
   
-  def __init__(self):
-    self.id = 'Unknown'
+  def __init__(self,id='Unknown'):
+    AbstractIdentifier.__init__(self)
+    self.id = id
   
   def identify(self):
     return self.id
     
 class UUIDIdentifier(AbstractIdentifier):
   
-  idFile = property(lambda self : self._id_file,lambda self,value:self._init_id_file(value) )   
+  id_file = property(lambda self : self._id_file,lambda self,value:self._init_id_file(value) )
   
-  def UUIDIdentifier(self):
+  def __init__(self, id_file='uuid'):
     AbstractIdentifier.__init__(self)
-    self._id_file = 'uuid'
+    self.__id = ''
+    self.id_file = id_file
     
   def _init_id_file(self,value):
     if path.isfile(value):

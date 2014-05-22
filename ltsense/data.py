@@ -11,9 +11,7 @@ class AbstractDataHandler(object):
 
   def __init__(self):
     object.__init__(self)
-    self.transports = None
     self.identifier = None
-    self._security = None
 
   def render_data(self,sensors):
     pass
