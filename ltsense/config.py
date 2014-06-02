@@ -61,15 +61,19 @@ class BootStrap(object):
       trans[t] = tran
     return trans
 
-  def __sensors(self):
+  def __sensors(self,cfg):
+    pass
+
+  def __sensor_handlers(self):
     snsec = self.__cfg['Sensors']
-    senses = {}
-    for s in senses:
-      if senses[s]['type'] == 'virtual':
+    handelers = {}
+    for sh in snsec:
+      if snsec[sh]['type'] == 'virtual':
+        for sns in snsec[sh]:
+          pass
+      elif snsec[sh]['type'] == '1wire/usb':
         pass
-      elif senses[s]['type'] == '1wire/usb':
-        pass
-      elif senses[s]['type'] == 'adc/beagleboneblack':
+      elif snsec[sh]['type'] == 'adc/beagleboneblack':
         pass
 
   def __data(self):

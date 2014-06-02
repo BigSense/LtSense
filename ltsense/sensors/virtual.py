@@ -19,11 +19,11 @@ class RandomSensor(AbstractSensor):
 
   def __init__(self):
     AbstractSensor.__init__(self)
-    self.rangeMin = 0
-    self.rangeMax = 10
+    self.range_min = 0
+    self.range_max = 10
 
   def _random(self):
-    return str(random.randint(int(self.rangeMin),int(self.rangeMax)))
+    return str(random.randint(int(self.range_min),int(self.range_max)))
 
   data = property(_random,lambda self,v:None )
 
@@ -55,16 +55,16 @@ class IncrementingSensor(AbstractSensor):
   
   def __init__(self):
     AbstractSensor.__init__(self)
-    self.rangeMin = 0
-    self.rangeMax = 10
+    self.range_min = 0
+    self.range_max = 10
     self.current = -1
-    self.countDir = None
+    self.count_dir = None
     self.float = False
-    self.floatPercision = 2      
+    self.float_percision = 2
     
   def _read_vcount(self):
     
-    cfile = os.path.join(self.countDir,self.id)
+    cfile = os.path.join(self.count_dir,self.id)
     
     if self.current == -1:
       if os.path.exists(cfile):
@@ -75,10 +75,10 @@ class IncrementingSensor(AbstractSensor):
         self.current = 0
     
     if bool(self.float):
-      self.current = ('%.'+self.floatPercision+'f') % (float(self.current) + random.uniform(float(self.rangeMin),float(self.rangeMax)))
+      self.current = ('%.'+self.float_percision+'f') % (float(self.current) + random.uniform(float(self.range_min),float(self.range_max)))
       
     else :
-      self.current = int(self.current) + random.randint(int(self.rangeMin),int(self.rangeMax))
+      self.current = int(self.current) + random.randint(int(self.range_min),int(self.range_max))
       
     fd = open(cfile,'w')
     fd.write(str(self.current))
