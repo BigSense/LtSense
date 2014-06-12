@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from configobj import ConfigObj
+from configobj import ConfigObj,Section
 from ltsense.data import SenseDataHandler
 from ltsense.identification import MacAddressIdentifier,UUIDIdentifier,NamedIdentifier
 from ltsense.queue import MemoryQueue, SQLiteQueue
@@ -9,6 +9,7 @@ from ltsense.transport.http import QueuedHttpPostTransport
 
 
 class BootStrap(object):
+
 
   def _identity(self,idsec):
     if idsec['type'] == "name":
@@ -90,16 +91,45 @@ class BootStrap(object):
     return datas
 
 
+  def proc(self,cfg):
+    for c in cfg:
+      if c == 'General':
+        print('General Sec')
+      else:
+        if type(cfg[c]) is Section:
+          if c[0].isupper():
+            print('You are in a section: '+c)
+            self.proc(cfg[c])
+          else:
+            print('You want a named variable: '+ c)
+            self.proc(cfg[c])
+        else:
+          print("You want a attribute: " + c)
+          #print('You want a ' + self.types[c][cfg[c]['type']])
 
 
   def __init__(self, filename):
 
     cfg = ConfigObj(filename)
 
-    dev_id = self.__identify(cfg)
-    for sns in cfg['Sensors']:
-      stype = sns['type']
+    self.types = { 'Identification' :
+                  { 'name' : 'NamedIdentifier' ,
+                       'mac'  : 'MacAddressIdentifier' ,
+                       'uuid' : 'UUIDIdentifier'} ,
+              'Queue' :
+                  { 'memory' : 'MemoryQueue' ,
+                    'sqlite' : 'SQLiteQueue' },
+              'Security' :
+                  { 'rsa' : 'RSASecurity',
+                    'm2'  : 'M2Security' },
+              'Transports' :
+                  { 'http' : 'QueuedHttpPostTransport' },
+              'Data' :
+                  { 'sense.xml' : 'SenseDataHandler' }
+            }
 
 
-    cfg['General']['sample_rate']
+    self.proc(cfg)
+
+
 
