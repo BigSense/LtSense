@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 from configobj import ConfigObj,Section
+import logging
+import ast
 from ltsense.data import SenseDataHandler
 from ltsense.identification import MacAddressIdentifier,UUIDIdentifier,NamedIdentifier
 from ltsense.queue import MemoryQueue, SQLiteQueue
@@ -11,7 +13,7 @@ from ltsense.transport.http import QueuedHttpPostTransport
 class BootStrap(object):
 
 
-  def _identity(self,idsec):
+  """def _identity(self,idsec):
     if idsec['type'] == "name":
       return NamedIdentifier(idsec['name'])
       return n
@@ -88,21 +90,42 @@ class BootStrap(object):
       else:
         pass #todo error?
 
-    return datas
+    return datas"""
+
+#Taken from
+# http://stackoverflow.com/questions/547829/how-to-dynamically-load-a-python-class
+  def _load_obj(self,name):
+    components = name.split('.')
+    path = '.'.join(components[:-1])
+    clss = components[-1:][0]
+    mod = __import__(path,globals(),locals(),clss)
+    return getattr(mod,clss)()
+
+  def _set_args(self,obj,key,value):
+    if value.strip()[0] == '$':
+      #delay evaluation
+      pass
+    else:
+      arg = ast.literal_eval(value)
+      logging.debug('Setting attribute %s to %s for class %s' % (key,arg,obj))
+      setattr(obj,key,arg)
 
 
-  def proc(self,cfg):
+  def proc(self,cfg,section=None,variable=None):
     for c in cfg:
       if c == 'General':
         print('General Sec')
       else:
         if type(cfg[c]) is Section:
           if c[0].isupper():
-            print('You are in a section: '+c)
-            self.proc(cfg[c])
+            if variable is None:
+              print('You are in a section: '+c)
+              self.proc(cfg[c],c)
+            else:
+              print('You are in section for a variable')
           else:
             print('You want a named variable: '+ c)
-            self.proc(cfg[c])
+            self.proc(cfg[c],section,c)
         else:
           print("You want a attribute: " + c)
           #print('You want a ' + self.types[c][cfg[c]['type']])
@@ -112,10 +135,14 @@ class BootStrap(object):
 
     cfg = ConfigObj(filename)
 
+    self._section = {}
+    self._vars = {}
+    self._delayed_eval = {}
+
     self.types = { 'Identification' :
-                  { 'name' : 'NamedIdentifier' ,
-                       'mac'  : 'MacAddressIdentifier' ,
-                       'uuid' : 'UUIDIdentifier'} ,
+                  { 'name'  : 'NamedIdentifier' ,
+                    'mac'  : 'MacAddressIdentifier' ,
+                    'uuid' : 'UUIDIdentifier'} ,
               'Queue' :
                   { 'memory' : 'MemoryQueue' ,
                     'sqlite' : 'SQLiteQueue' },
