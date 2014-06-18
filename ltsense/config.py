@@ -111,6 +111,13 @@ class BootStrap(object):
       setattr(obj,key,arg)
 
 
+  def _modules_name(self,section):
+    """  """
+    if section == 'Transport':
+      return 'ltsense.transport.http'
+    else:
+      return 'ltsense.' + section.lower()
+
   def proc(self,cfg,section=None,variable=None):
     for c in cfg:
       if c == 'General':
@@ -124,7 +131,12 @@ class BootStrap(object):
             else:
               print('You are in section for a variable')
           else:
-            print('You want a named variable: '+ c)
+            tp = cfg[c]['type']
+            print('You want a named variable: '+ c + ' (with type' + tp + ')')
+            print('ltsense.{0}.{1}'.format(section.lower(),self.types[section][cfg[c]['type']]))
+            obj = self._load_obj('{0}.{1}'.format(self._modules_name(section),self.types[section][cfg[c]['type']]))
+            print(obj)
+
             self.proc(cfg[c],section,c)
         else:
           print("You want a attribute: " + c)
@@ -139,6 +151,9 @@ class BootStrap(object):
     self._vars = {}
     self._delayed_eval = {}
 
+    self.namespaces = {'Identification' : 'identification' ,
+                       'Queue' : 'queue'}
+
     self.types = { 'Identification' :
                   { 'name'  : 'NamedIdentifier' ,
                     'mac'  : 'MacAddressIdentifier' ,
@@ -149,7 +164,7 @@ class BootStrap(object):
               'Security' :
                   { 'rsa' : 'RSASecurity',
                     'm2'  : 'M2Security' },
-              'Transports' :
+              'Transport' :
                   { 'http' : 'QueuedHttpPostTransport' },
               'Data' :
                   { 'sense.xml' : 'SenseDataHandler' }
