@@ -167,7 +167,10 @@ class BootStrap(object):
               'Transport' :
                   { 'http' : 'QueuedHttpPostTransport' },
               'Data' :
-                  { 'sense.xml' : 'SenseDataHandler' }
+                  { 'sense.xml' : 'SenseDataHandler' },
+              'Sensors' :
+                  { 'virtual' : ''  ,
+                    '1wire/usb' : ''}
             }
 
 
