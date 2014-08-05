@@ -128,13 +128,19 @@ class BootStrap(object):
             tp = cfg[c]['type']
             print('You want a named variable: '+ c + ' (with type' + tp + ')')
             print('ltsense.{0}.{1}'.format(section.lower(),self.types[section][cfg[c]['type']]))
-            obj = self._load_obj('{0}.{1}'.format(section.lower(),self.types[section][cfg[c]['type']]))
-            print(obj)
-
+            #self._object_map[c] = self._load_obj('{0}.{1}'.format(section.lower(),self.types[section][cfg[c]['type']]))
             self.proc(cfg[c],section,c)
         else:
-          print("You want a attribute: " + c)
-          #print('You want a ' + self.types[c][cfg[c]['type']])
+          print("You want a attribute: " + c + " for " + variable )
+          #Anything starting with $ or is a list has delayed evaluation
+          if cfg[c][0] == '$' or isinstance(cfg[c],list):
+            print("Delay eval for" +  cfg[c])
+            self._delayed_eval[variable] = cfg[c]
+          elif c != 'type':
+            pass
+          else:
+            self._set_args(self._object_map[variable],c,cfg[c])
+            #print('You want a ' + self.types[c][cfg[c]['type']])
 
 
   def __init__(self, filename):
@@ -144,6 +150,7 @@ class BootStrap(object):
     self._section = {}
     self._vars = {}
     self._delayed_eval = {}
+    self._object_map = {}
 
     self.namespaces = {'Identification' : 'identification' ,
                        'Queue' : 'queue'}
