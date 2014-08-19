@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from configobj import ConfigObj,Section
+from validate import Validator
 import logging
 import ast
 from ltsense.data import SenseDataHandler
@@ -12,6 +13,47 @@ from ltsense.transport.http import QueuedHttpPostTransport
 
 class BootStrap(object):
 
+  config_specification = """
+[General]
+
+sample_rate = float
+
+[Data]
+  [[__many__]]
+    type = option('sense.xml')
+    transports = string
+    sensors = string(list_values=True)
+      [Identification]
+        type = option('name', 'mac', 'uuid')
+        adapter = string
+        name = string
+        file = string
+
+[Transport]
+  [[__many__]]
+    url = string
+    pause_rate = float
+    timeout = float
+    type = option('http')
+      [[[Queue]]]
+        type = option('memory','sqlite')
+        data = string
+      [[Security]]
+        type = option('none','rsa','m2')
+        data_dir = string
+        key_file = string
+        key_size = integer
+
+[Sensors]
+  [[__many__]]
+    type = option('virtual','1write/usb')
+      [[[__many__]]]
+        type = option('virtual/temp')
+        id = string
+        units = string
+        rangeMin = integer
+        rangeMax = integer
+"""
 
   """def _identity(self,idsec):
     if idsec['type'] == "name":
@@ -106,9 +148,11 @@ class BootStrap(object):
       #delay evaluation
       pass
     else:
-      arg = ast.literal_eval(value)
-      logging.debug('Setting attribute %s to %s for class %s' % (key,arg,obj))
-      setattr(obj,key,arg)
+      print("Value " + value)
+      print("Type " + str(type(value)))
+      #arg = ast.literal_eval(value)
+      logging.debug('Setting attribute %s to %s for class %s' % (key,value,obj))
+      setattr(obj,key,value)
 
 
 
@@ -128,24 +172,31 @@ class BootStrap(object):
             tp = cfg[c]['type']
             print('You want a named variable: '+ c + ' (with type' + tp + ')')
             print('ltsense.{0}.{1}'.format(section.lower(),self.types[section][cfg[c]['type']]))
-            #self._object_map[c] = self._load_obj('{0}.{1}'.format(section.lower(),self.types[section][cfg[c]['type']]))
+            self._object_map[c] = self._load_obj('{0}.{1}'.format(section.lower(),self.types[section][cfg[c]['type']]))
             self.proc(cfg[c],section,c)
         else:
           print("You want a attribute: " + c + " for " + variable )
           #Anything starting with $ or is a list has delayed evaluation
           if cfg[c][0] == '$' or isinstance(cfg[c],list):
-            print("Delay eval for" +  cfg[c])
+            print("Delay eval for" +  str(cfg[c]))
             self._delayed_eval[variable] = cfg[c]
-          elif c != 'type':
+          elif c == 'type':
             pass
           else:
             self._set_args(self._object_map[variable],c,cfg[c])
             #print('You want a ' + self.types[c][cfg[c]['type']])
 
 
+
+
   def __init__(self, filename):
 
-    cfg = ConfigObj(filename)
+    print(BootStrap.config_specification.split('\n'))
+    spec = ConfigObj(BootStrap.config_specification.split('\n'), raise_errors=True)
+    cfg = ConfigObj(filename, configspec=spec)
+    test = cfg.validate(Validator())
+    if not test:
+      print("Invalid")
 
     self._section = {}
     self._vars = {}
