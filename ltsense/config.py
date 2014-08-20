@@ -86,7 +86,7 @@ sample_rate = float
           #Anything starting with $ or is a list has delayed evaluation
           if (isinstance(cfg[c],basestring) and cfg[c][0] == '$') or isinstance(cfg[c],list):
             logging.debug("Delay evaluation for {0}".format(cfg[c]))
-            self._delayed_eval[variable] = cfg[c]
+            self._delayed_eval[variable] = (c,cfg[c])
           elif c == 'type':
             pass
           else:
@@ -103,8 +103,6 @@ sample_rate = float
     if not test:
       print("Invalid")
 
-    self._section = {}
-    self._vars = {}
     self._delayed_eval = {}
     self._object_map = {}
 
@@ -136,6 +134,11 @@ sample_rate = float
 
 
     self.proc(cfg)
+    for d in self._delayed_eval:
+      if isinstance(d[1],list):
+        pass
+      else:
+        d[1:]
 
 
 
