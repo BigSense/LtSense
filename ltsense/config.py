@@ -58,9 +58,7 @@ sample_rate = float
     return getattr(mod,clss)()
 
   def _set_args(self,obj,key,value):
-    print("Value " + str(value))
-    print("Type " + str(type(value)))
-    logging.debug('Setting attribute %s to %s for class %s' % (key,value,obj))
+    logging.debug('Setting attribute %s to %s for class %s (type: %s)' % (key,value,obj,type(value)))
     setattr(obj,key,value)
 
 
@@ -68,26 +66,26 @@ sample_rate = float
   def proc(self,cfg,section=None,variable=None):
     for c in cfg:
       if c == 'General':
-        print('General Sec')
+        logging.debug('Loading General Section')
       else:
         if type(cfg[c]) is Section:
           if c[0].isupper():
             if variable is None:
-              print('You are in a section: '+c)
+              logging.debug('Loading Section: {0} '.format(c))
               self.proc(cfg[c],c)
             else:
-              print('You are in section for a variable')
+              pass
           else:
             tp = cfg[c]['type']
-            print('You want a named variable: '+ c + ' (with type ' + tp + ')')
-            print('ltsense.{0}.{1}'.format(section.lower(),self.types[section][cfg[c]['type']]))
+            logging.debug('Creating variable {0} with type {1}'.format(c,tp))
+            logging.debug('ltsense.{0}.{1}'.format(section.lower(),self.types[section][cfg[c]['type']]))
             self._object_map[c] = self._load_obj('{0}.{1}'.format(section.lower(),self.types[section][cfg[c]['type']]))
             self.proc(cfg[c],section,c)
         else:
-          print("You want a attribute: " + c + " for " + variable )
+          logging.debug('Setting attribute {0} for {1}'.format(c,variable))
           #Anything starting with $ or is a list has delayed evaluation
           if (isinstance(cfg[c],basestring) and cfg[c][0] == '$') or isinstance(cfg[c],list):
-            print("Delay eval for" +  str(cfg[c]))
+            logging.debug("Delay evaluation for {0}".format(cfg[c]))
             self._delayed_eval[variable] = cfg[c]
           elif c == 'type':
             pass
@@ -128,11 +126,12 @@ sample_rate = float
               'Data' :
                   { 'sense.xml' : 'SenseDataHandler' },
               'SensorHandlers' :
-                  { 'virtual' : 'handlers.GeneralSensorHandler' ,
-                    '1wire/usb' : 'handlers.OWFSSensorHandler' },
+                  {  },
               'Sensors' :
-                { 'virtual/temp' : 'sensors.virtual.RandomSensor',
-                  'virtual/image' : 'sensors.virtual.ImageSensor'}
+                { 'virtual/temp' : 'virtual.RandomSensor',
+                  'virtual/image' : 'virtual.ImageSensor',
+                  'virtual' : 'handlers.GeneralSensorHandler',
+                  '1wire/usb' : 'handlers.OWFSSensorHandler'}
             }
 
 
