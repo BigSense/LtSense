@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Primary namespace for all BigSense LtSense Code.
    LtSense is the client used to transmit sensor data to
-   the BigSense Web Service"""
+   the BigSense Web Service http://bigsense.io"""
 
 
 exit_all_threads = False

@@ -2,6 +2,7 @@
 from configobj import ConfigObj,Section
 from validate import Validator
 import logging
+from ltsense.controller import DefaultController
 
 
 class BootStrap(object):
@@ -63,16 +64,18 @@ sample_rate = float
 
 
 
-  def proc(self,cfg,section=None,variable=None):
+  def __process(self,cfg,section=None,variable=None):
+    """Recursively processes a configuration object"""
     for c in cfg:
       if c == 'General':
         logging.debug('Loading General Section')
+        self._controller.sample_rate = cfg[c]['sample_rate']
       else:
         if type(cfg[c]) is Section:
           if c[0].isupper():
             if variable is None:
               logging.debug('Loading Section: {0} '.format(c))
-              self.proc(cfg[c],c)
+              self.__process(cfg[c],c)
             else:
               pass
           else:
@@ -80,9 +83,12 @@ sample_rate = float
             logging.debug('Creating variable {0} with type {1}'.format(c,tp))
             logging.debug('ltsense.{0}.{1}'.format(section.lower(),self.types[section][cfg[c]['type']]))
             self._object_map[c] = self._load_obj('{0}.{1}'.format(section.lower(),self.types[section][cfg[c]['type']]))
-            self.proc(cfg[c],section,c)
+            if section == 'Data':
+              self._data_handlers.append(self._object_map[c])
+            if section == 'Sensors' and self.types[section][cfg[c]['type']].split('.')[0] == 'handlers':
+              self._sensor_handlers.append(self._object_map[c])
+            self.__process(cfg[c],section,c)
         else:
-          logging.debug('Setting attribute {0} for {1}'.format(c,variable))
           #Anything starting with $ or is a list has delayed evaluation
           if (isinstance(cfg[c],basestring) and cfg[c][0] == '$') or isinstance(cfg[c],list):
             logging.debug("Delay evaluation for {0}".format(cfg[c]))
@@ -90,21 +96,33 @@ sample_rate = float
           elif c == 'type':
             pass
           else:
+            logging.debug('Setting attribute {0} for {1}'.format(c,variable))
             self._set_args(self._object_map[variable],c,cfg[c])
             #print('You want a ' + self.types[c][cfg[c]['type']])
 
-
+  def __eval_item(self,item):
+    """Used for deferred evaluation variables (those that start with $) and lists.
+      Items in list starting with $ will be substituted for defined objects.
+      All other list items will be treated as string.
+    """
+    if isinstance(item,list):
+      #Substitute all variables (start with $)
+      for i,j in enumerate(item):
+        if j[0] == '$':
+          item[i] = self._object_map(j[1:])
+      return item
+    else:
+      return item[1:]
 
 
   def __init__(self, filename):
 
-    cfg = ConfigObj(filename, configspec=BootStrap.config_specification.split('\n'))
-    test = cfg.validate(Validator(),copy=True)
-    if not test:
-      print("Invalid")
-
     self._delayed_eval = {}
     self._object_map = {}
+    self._controller = DefaultController()
+
+    self._data_handlers = []
+    self._sensor_handlers = []
 
     self.namespaces = {'Identification' : 'identification' ,
                        'Queue' : 'queue'}
@@ -123,8 +141,6 @@ sample_rate = float
                   { 'http' : 'http.QueuedHttpPostTransport' },
               'Data' :
                   { 'sense.xml' : 'SenseDataHandler' },
-              'SensorHandlers' :
-                  {  },
               'Sensors' :
                 { 'virtual/temp' : 'virtual.RandomSensor',
                   'virtual/image' : 'virtual.ImageSensor',
@@ -132,13 +148,21 @@ sample_rate = float
                   '1wire/usb' : 'handlers.OWFSSensorHandler'}
             }
 
+    cfg = ConfigObj(filename, configspec=BootStrap.config_specification.split('\n'))
+    test = cfg.validate(Validator(),copy=True)
+    if not test:
+      print("Invalid")
 
-    self.proc(cfg)
-    for d in self._delayed_eval:
-      if isinstance(d[1],list):
-        pass
-      else:
-        d[1:]
+    self.__process(cfg)
+    for var,(attr,val) in self._delayed_eval.items():
+      item = self.__eval_item(val)
+      logging.debug("Setting object {0}, {1} = {2}".format(var,attr,item))
+      self._set_args(self._object_map[var], attr, self._object_map( item ))
+
+    self._controller.data_handlers = self._data_handlers
+    self._controller.sensor_handlers = self._sensor_handlers
+
+
 
 
 

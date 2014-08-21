@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
-from optparse import OptionParser,OptionGroup
+from optparse import OptionParser
 import sys
-import logging 
-import ltsense.loader
+import logging
+import ltsense
+from ltsense.config import BootStrap
 import datetime
 import signal
 from os.path import basename
@@ -34,7 +35,7 @@ def logfile_arg():
 if __name__ == '__main__':
 
   parser = OptionParser(usage="%prog [-dvq] [-l <logfile>] [-c config ]",
-                         description="Greenstation sensor relay service.\n", version="%prog 0.1 alpha", epilog='Copyright 2011 Sumit Khanna. PenguinDreams.org')
+                         description="LtSense sensor relay service.\n", version="%prog 0.1 alpha", epilog='Copyright 2011 Sumit Khanna. http://BigSense.io')
   parser.add_option('-d','--debug',action='store_true',help='show additional debugging output')
   parser.add_option('-l','--logfile',action='callback',callback=logfile_arg(),help='store output to logfile [default: var/log/%s_yyyy-mm-dd-hhmmss.log]' % basename(sys.argv[0]),metavar='FILE',dest='logfile')
   parser.add_option('-c','--config',action='store',dest='config',help='configuration file [default: %default]',default='etc/gm.config')
@@ -67,9 +68,10 @@ if __name__ == '__main__':
     logfile.setFormatter(logging.Formatter('%(asctime)s %(levelname)-8s %(message)s'))
     logging.getLogger('').addHandler(logfile)             
 
-  
-  ltsense.loader.load_config(options.config)
-  controller = ltsense.loader.get_class('Controller')
+
+  BootStrap(options.config)
+  #ltsense.loader.load_config(options.config)
+  #controller = ltsense.loader.get_class('Controller')
   #pause for Ctrl+C Signal Handler
   signal.pause()
    

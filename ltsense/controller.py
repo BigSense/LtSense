@@ -11,28 +11,24 @@ class AbstractController(Thread):
   def __init__(self):
     Thread.__init__(self)
     
-    self.sampleRate = 10.0
-    self.dataHandlers = None
-    self.sensorHandlers = None
+    self.sample_rate = 10.0
     self.transports = None
-  
-    self.sensorHandlers = []
-    self.dataHandlers = []
+    self.sensor_handlers = []
+    self.data_handlers = []
 
   def run(self):
     while not ltsense.exit_all_threads:
       self.process_sensor_data()
-      time.sleep(float(self.sampleRate))
+      time.sleep(float(self.sample_rate))
     logging.info('Exit Detected. Stopping Controller Thread')
 
   def process_sensor_data(self):
-    if self.sensorHandlers != None:
-      sensors = []
-      for h in self.sensorHandlers:        
-        sensors.extend( h.sensors )
-      if self.dataHandlers != None:
-        for d in self.dataHandlers:
-          d.render_data(sensors)
+    sensors = []
+    for h in self.sensor_handlers:
+      sensors.extend( h.sensors )
+
+    for d in self.data_handlers:
+      d.render_data(sensors)
 
 class DefaultController(AbstractController):
 
@@ -46,16 +42,14 @@ class RespawningController(AbstractController):
     AbstractController.__init__(self)
     #default, exit if we respawn more than 10
     # times in 10 seconds
-    self.respawnRateLimit = 10
-    self.respawnTimeLimit = 10
+    self.respawn_rate_limit = 10
+    self.respawn_time_limit = 10
     self.start()
- 
-  def run(self):
-    spawnCount = 0
-    spawnTime = int(time.time())
 
-    
-    
+  def run(self):
+    spawn_count = 0
+    spawn_time = int(time.time())
+
     try:
       AbstractController.run()
     except:

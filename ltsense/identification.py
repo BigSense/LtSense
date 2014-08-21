@@ -14,9 +14,9 @@ class AbstractIdentifier(object):
     
 class MacAddressIdentifier(AbstractIdentifier):
   
-  def __init__(self,adapter = 'eth0'):
+  def __init__(self):
     AbstractIdentifier.__init__(self)
-    self.adapter = adapter
+    self.adapter = 'eth0'
     
   def identify(self):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -25,9 +25,9 @@ class MacAddressIdentifier(AbstractIdentifier):
 
 class NamedIdentifier(AbstractIdentifier):
   
-  def __init__(self,id='Unknown'):
+  def __init__(self):
     AbstractIdentifier.__init__(self)
-    self.id = id
+    self.id = 'Unknown'
   
   def identify(self):
     return self.id
@@ -36,10 +36,9 @@ class UUIDIdentifier(AbstractIdentifier):
   
   id_file = property(lambda self : self._id_file,lambda self,value:self._init_id_file(value) )
   
-  def __init__(self, id_file='uuid'):
+  def __init__(self):
     AbstractIdentifier.__init__(self)
-    self.__id = ''
-    self.id_file = id_file
+    self.id_file = 'uuid'
     
   def _init_id_file(self,value):
     if path.isfile(value):
