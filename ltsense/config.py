@@ -64,7 +64,7 @@ sample_rate = float
 
 
 
-  def __process(self,cfg,section=None,variable=None):
+  def __process(self,cfg,section=None,variable=None, attach=None):
     """Recursively processes a configuration object"""
     for c in cfg:
       if c == 'General':
