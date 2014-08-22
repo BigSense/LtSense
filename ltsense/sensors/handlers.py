@@ -62,6 +62,3 @@ class GeneralSensorHandler(AbstractSensorHandler):
   
   def __init__(self):
     AbstractSensorHandler.__init__(self)
-
-  def add_sensors(self,sensors):
-    self.sensors.append(sensors)

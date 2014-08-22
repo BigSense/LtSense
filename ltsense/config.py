@@ -64,7 +64,7 @@ sample_rate = float
 
 
 
-  def __process(self,cfg,section=None,variable=None, attach=None):
+  def __process(self,cfg,section=None,variable=None):
     """Recursively processes a configuration object"""
     for c in cfg:
       if c == 'General':
@@ -77,17 +77,30 @@ sample_rate = float
               logging.debug('Loading Section: {0} '.format(c))
               self.__process(cfg[c],c)
             else:
-              pass
+              #Anonymous Sections are a little special
+              # we don't reuse them so they don't get their own sections
+              # We're going to create delayed eval variables and give them the name
+              # basevar$section
+              cfg[c] = "{0}${1}".format(variable,c)
+              self._delayed_eval[cfg[c]] = (variable,c.lower())
           else:
-            tp = cfg[c]['type']
-            logging.debug('Creating variable {0} with type {1}'.format(c,tp))
-            logging.debug('ltsense.{0}.{1}'.format(section.lower(),self.types[section][cfg[c]['type']]))
-            self._object_map[c] = self._load_obj('{0}.{1}'.format(section.lower(),self.types[section][cfg[c]['type']]))
-            if section == 'Data':
-              self._data_handlers.append(self._object_map[c])
-            if section == 'Sensors' and self.types[section][cfg[c]['type']].split('.')[0] == 'handlers':
-              self._sensor_handlers.append(self._object_map[c])
-            self.__process(cfg[c],section,c)
+            if variable is not None:
+              # this is for one case, and that's Sensors
+              if variable not in self._delayed_eval:
+                self._delayed_eval[variable] = ('sensors',"${0}".format([cfg[c]]))
+              # ARGG Fuck all this shit!
+              #if self._delayed_eval[variable]
+              #self.__process(cfg[c],c)
+            else:
+              tp = cfg[c]['type']
+              logging.debug('Creating variable {0} with type {1}'.format(c,tp))
+              logging.debug('ltsense.{0}.{1}'.format(section.lower(),self.types[section][cfg[c]['type']]))
+              self._object_map[c] = self._load_obj('{0}.{1}'.format(section.lower(),self.types[section][cfg[c]['type']]))
+              if section == 'Data':
+                self._data_handlers.append(self._object_map[c])
+              if section == 'Sensors' and self.types[section][cfg[c]['type']].split('.')[0] == 'handlers':
+                self._sensor_handlers.append(self._object_map[c])
+              self.__process(cfg[c],section,c)
         else:
           #Anything starting with $ or is a list has delayed evaluation
           if (isinstance(cfg[c],basestring) and cfg[c][0] == '$') or isinstance(cfg[c],list):

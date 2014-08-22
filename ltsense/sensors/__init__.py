@@ -54,4 +54,4 @@ class AbstractSensorHandler(object):
 
   def __init__(self):
     object.__init__(self)
-    self.sensors = {}
+    self.sensors = []
