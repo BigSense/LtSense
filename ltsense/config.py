@@ -63,6 +63,10 @@ sample_rate = float
     setattr(obj,key,value)
 
 
+  def __add_delay_eval(self,var,attr,val):
+    if var not in self._delayed_eval:
+      self._delayed_eval[var] = {}
+    self._delayed_eval[var][attr] = val
 
   def __process(self,cfg,section=None,variable=None):
     """Recursively processes a configuration object"""
@@ -82,15 +86,14 @@ sample_rate = float
               # We're going to create delayed eval variables and give them the name
               # basevar$section
               cfg[c] = "{0}${1}".format(variable,c)
-              self._delayed_eval[cfg[c]] = (variable,c.lower())
+              #self._add_delayed_eval(cfg[c],variable,c.lower())
+              #self._delayed_eval[cfg[c]] = (variable,c.lower())
           else:
             if variable is not None:
               # this is for one case, and that's Sensors
               if variable not in self._delayed_eval:
-                self._delayed_eval[variable] = ('sensors',"${0}".format([cfg[c]]))
-              # ARGG Fuck all this shit!
-              #if self._delayed_eval[variable]
-              #self.__process(cfg[c],c)
+                self.__add_delay_eval(variable,'sensors',[cfg[c]])
+                #self._delayed_eval[variable] = ('sensors',"${0}".format([cfg[c]]))
             else:
               tp = cfg[c]['type']
               logging.debug('Creating variable {0} with type {1}'.format(c,tp))
@@ -105,7 +108,7 @@ sample_rate = float
           #Anything starting with $ or is a list has delayed evaluation
           if (isinstance(cfg[c],basestring) and cfg[c][0] == '$') or isinstance(cfg[c],list):
             logging.debug("Delay evaluation for {0}".format(cfg[c]))
-            self._delayed_eval[variable] = (c,cfg[c])
+            self.__add_delay_eval(variable,c,cfg[c])
           elif c == 'type':
             pass
           else:
@@ -167,10 +170,11 @@ sample_rate = float
       print("Invalid")
 
     self.__process(cfg)
-    for var,(attr,val) in self._delayed_eval.items():
-      item = self.__eval_item(val)
-      logging.debug("Setting object {0}, {1} = {2}".format(var,attr,item))
-      self._set_args(self._object_map[var], attr, self._object_map( item ))
+    for var in self._delayed_eval:
+      for i in self._delayed_eval[var]:
+        item = self.__eval_item(i[1])
+        logging.debug("Setting object {0}, {1} = {2}".format(var,i[0],item))
+        self._set_args(self._object_map[var], i[0], item )
 
     self._controller.data_handlers = self._data_handlers
     self._controller.sensor_handlers = self._sensor_handlers
