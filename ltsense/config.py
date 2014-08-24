@@ -75,6 +75,7 @@ sample_rate = float
         logging.debug('Loading General Section')
         self._controller.sample_rate = cfg[c]['sample_rate']
       else:
+        logging.debug("Where am I cfg {0}".format(cfg))
         if type(cfg[c]) is Section:
           if c[0].isupper():
             if variable is None:
@@ -85,8 +86,10 @@ sample_rate = float
               # we don't reuse them so they don't get their own sections
               # We're going to create delayed eval variables and give them the name
               # basevar$section
-              cfg[c] = "{0}${1}".format(variable,c)
-              #self._add_delayed_eval(cfg[c],variable,c.lower())
+              anonVar = "{0}${1}".format(variable,c)
+              self.__add_delay_eval(variable,c.lower(),anonVar)
+              self.__process(cfg,anonVar)
+
               #self._delayed_eval[cfg[c]] = (variable,c.lower())
           else:
             if variable is not None:
