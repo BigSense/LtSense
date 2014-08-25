@@ -68,56 +68,36 @@ sample_rate = float
       self._delayed_eval[var] = {}
     self._delayed_eval[var][attr] = val
 
+  def __create_variable(self,cfg,section,c,var):
+    tp = cfg[c]['type']
+    logging.debug('Creating variable {0} with type {1}'.format(c,tp))
+    logging.debug('ltsense.{0}.{1}'.format(section.lower(),self.types[section][cfg[c]['type']]))
+    self._object_map[var] = self._load_obj('{0}.{1}'.format(section.lower(),self.types[section][cfg[c]['type']]))
+
   def __process(self,cfg,section=None,variable=None):
     """Recursively processes a configuration object"""
+    logging.debug("Section: {0} :: Var {0}".format(section,variable))
     for c in cfg:
       if c == 'General':
         logging.debug('Loading General Section')
         self._controller.sample_rate = cfg[c]['sample_rate']
       else:
-        logging.debug("Where am I cfg {0}".format(cfg))
         if type(cfg[c]) is Section:
           if c[0].isupper():
-            if variable is None:
               logging.debug('Loading Section: {0} '.format(c))
-              self.__process(cfg[c],c)
-            else:
-              #Anonymous Sections are a little special
-              # we don't reuse them so they don't get their own sections
-              # We're going to create delayed eval variables and give them the name
-              # basevar$section
-              anonVar = "{0}${1}".format(variable,c)
-              self.__add_delay_eval(variable,c.lower(),anonVar)
-              self.__process(cfg,anonVar)
-
-              #self._delayed_eval[cfg[c]] = (variable,c.lower())
           else:
-            if variable is not None:
-              # this is for one case, and that's Sensors
-              if variable not in self._delayed_eval:
-                self.__add_delay_eval(variable,'sensors',[cfg[c]])
-                #self._delayed_eval[variable] = ('sensors',"${0}".format([cfg[c]]))
-            else:
-              tp = cfg[c]['type']
-              logging.debug('Creating variable {0} with type {1}'.format(c,tp))
-              logging.debug('ltsense.{0}.{1}'.format(section.lower(),self.types[section][cfg[c]['type']]))
-              self._object_map[c] = self._load_obj('{0}.{1}'.format(section.lower(),self.types[section][cfg[c]['type']]))
-              if section == 'Data':
-                self._data_handlers.append(self._object_map[c])
-              if section == 'Sensors' and self.types[section][cfg[c]['type']].split('.')[0] == 'handlers':
-                self._sensor_handlers.append(self._object_map[c])
-              self.__process(cfg[c],section,c)
+              logging.debug('Loading Variable: {0}'.format(c))
         else:
           #Anything starting with $ or is a list has delayed evaluation
           if (isinstance(cfg[c],basestring) and cfg[c][0] == '$') or isinstance(cfg[c],list):
             logging.debug("Delay evaluation for {0}".format(cfg[c]))
-            self.__add_delay_eval(variable,c,cfg[c])
+            #self.__add_delay_eval(variable,c,cfg[c])
           elif c == 'type':
             pass
           else:
             logging.debug('Setting attribute {0} for {1}'.format(c,variable))
-            self._set_args(self._object_map[variable],c,cfg[c])
-            #print('You want a ' + self.types[c][cfg[c]['type']])
+            #self._set_args(self._object_map[variable],c,cfg[c])
+
 
   def __eval_item(self,item):
     """Used for deferred evaluation variables (those that start with $) and lists.
@@ -162,9 +142,10 @@ sample_rate = float
                   { 'sense.xml' : 'SenseDataHandler' },
               'Sensors' :
                 { 'virtual/temp' : 'virtual.RandomSensor',
-                  'virtual/image' : 'virtual.ImageSensor',
-                  'virtual' : 'handlers.GeneralSensorHandler',
-                  '1wire/usb' : 'handlers.OWFSSensorHandler'}
+                  'virtual/image' : 'virtual.ImageSensor' },
+              'Handlers' :
+                { 'virtual' : 'GeneralSensorHandler',
+                  '1wire/usb' : 'OWFSSensorHandler'},
             }
 
     cfg = ConfigObj(filename, configspec=BootStrap.config_specification.split('\n'))
