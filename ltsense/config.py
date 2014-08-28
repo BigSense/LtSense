@@ -76,27 +76,32 @@ sample_rate = float
 
   def __process(self,cfg,section=None,variable=None):
     """Recursively processes a configuration object"""
-    logging.debug("Section: {0} :: Var {0}".format(section,variable))
+    logging.debug(">>Entry :: Section: {0} :: Var {1}".format(section,variable))
+    logging.debug("\t<<" + str(cfg))
     for c in cfg:
-      if c == 'General':
-        logging.debug('Loading General Section')
-        self._controller.sample_rate = cfg[c]['sample_rate']
-      else:
-        if type(cfg[c]) is Section:
-          if c[0].isupper():
-              logging.debug('Loading Section: {0} '.format(c))
-          else:
-              logging.debug('Loading Variable: {0}'.format(c))
+      logging.debug("\t>>{0}".format(c))
+      if type(cfg[c]) is Section:
+        if c == 'General':
+          logging.debug('Loading General Section')
+          self._controller.sample_rate = cfg[c]['sample_rate']
+        elif c[0].isupper() and section is None:
+          logging.debug('Loading Section: {0} '.format(c))
+          self.__process(cfg[c],c)
+        elif c[0].isupper() and section is not None:
+          logging.debug('Loading Anonymous Var Sub Section {0}'.format(c))
         else:
-          #Anything starting with $ or is a list has delayed evaluation
-          if (isinstance(cfg[c],basestring) and cfg[c][0] == '$') or isinstance(cfg[c],list):
-            logging.debug("Delay evaluation for {0}".format(cfg[c]))
-            #self.__add_delay_eval(variable,c,cfg[c])
-          elif c == 'type':
-            pass
-          else:
-            logging.debug('Setting attribute {0} for {1}'.format(c,variable))
-            #self._set_args(self._object_map[variable],c,cfg[c])
+          logging.debug('Loading Variable: {0}'.format(c))
+          self.__process(cfg[c],section,c)
+      else:
+        #Anything starting with $ or is a list has delayed evaluation
+        if (isinstance(cfg[c],basestring) and cfg[c][0] == '$') or isinstance(cfg[c],list):
+          logging.debug("Delay evaluation for {0}".format(cfg[c]))
+          #self.__add_delay_eval(variable,c,cfg[c])
+        elif c == 'type':
+          pass
+        else:
+          logging.debug('Setting attribute {0} for {1}'.format(c,variable))
+          #self._set_args(self._object_map[variable],c,cfg[c])
 
 
   def __eval_item(self,item):
@@ -151,9 +156,15 @@ sample_rate = float
     cfg = ConfigObj(filename, configspec=BootStrap.config_specification.split('\n'))
     test = cfg.validate(Validator(),copy=True)
     if not test:
+      #TODO: expand this
       print("Invalid")
+      exit(3)
 
-    self.__process(cfg)
+    for i in cfg['Transport']:
+      print(cfg['Transport'])
+      print(i)
+
+    """self.__process(cfg)
     for var in self._delayed_eval:
       for i in self._delayed_eval[var]:
         item = self.__eval_item(i[1])
@@ -161,7 +172,7 @@ sample_rate = float
         self._set_args(self._object_map[var], i[0], item )
 
     self._controller.data_handlers = self._data_handlers
-    self._controller.sensor_handlers = self._sensor_handlers
+    self._controller.sensor_handlers = self._sensor_handlers"""
 
 
 
