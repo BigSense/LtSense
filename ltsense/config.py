@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from configobj import ConfigObj,Section
+from configobj import ConfigObj,Section, flatten_errors
 from validate import Validator
 import logging
 from ltsense.controller import DefaultController
@@ -15,13 +15,13 @@ sample_rate = float
 [Data]
   [[__many__]]
     type = option('sense.xml')
-    transports = string
+    transport = string
     sensors = list
-      [[[Identification]]]
+      [[[Identifier]]]
         type = option("name", "mac", "uuid")
-        adapter = string
-        name = string
-        file = string
+        adapter = string(default='')
+        name = string(default='')
+        file = string(default='')
 
 [Transport]
   [[__many__]]
@@ -31,27 +31,25 @@ sample_rate = float
     type = option('http')
       [[[Queue]]]
         type = option('memory','sqlite')
-        data = string
+        data = string(default='')
       [[[Security]]]
         type = option('none','rsa','m2')
-        data_dir = string
-        key_file = string
-        key_size = integer
+        data_dir = string(default='')
+        key_file = string(default='')
+        key_size = integer(default=-1)
 
 [Handlers]
   [[__many__]]
-    type = option('virtual/temp')
+    type = option('virtual')
     sensors = string
 
 [Sensors]
   [[__many__]]
-    type = option('virtual','1write/usb')
-      [[[__many__]]]
-        type = option('virtual/temp')
-        id = string
-        units = string
-        rangeMin = integer
-        rangeMax = integer
+    type = option('virtual/temp')
+    id = string
+    units = string
+    rangeMin = integer
+    rangeMax = integer
 """
 
 #Taken from
@@ -97,7 +95,7 @@ sample_rate = float
           av = "$${0}.{1}".format(section.lower(),c)
           logging.debug('Loading Anonymous Variable {0} with Type: {1}'.format(av,c))
           self.__create_variable(cfg[c],c,av)
-          self.__add_delay_eval(variable,section.lower(),av)
+          self.__add_delay_eval(variable,c.lower(),av)
           self.__process(cfg[c],c,av)
         else:
           var = "${0}".format(c)
@@ -172,11 +170,20 @@ sample_rate = float
             }
 
     cfg = ConfigObj(filename, configspec=BootStrap.config_specification.split('\n'))
-    test = cfg.validate(Validator(),copy=True)
-    if not test:
-      #TODO: expand this
-      print("Invalid")
+
+    test = cfg.validate(Validator())
+
+    valid = True
+    for (section_list, key, _) in flatten_errors(cfg, test):
+      if key is not None:
+        print('Invalid value for key {0} in section {1}'.format(key,', '.join(section_list)))
+        valid = False
+      else:
+        print('Section {0} failed validation'.format(', '.join(section_list)))
+        valid = False
+    if not valid:
       exit(3)
+
 
     self.__process(cfg)
     self.__eval_delays()
