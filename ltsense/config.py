@@ -36,7 +36,7 @@ sample_rate = float
         type = option('none','rsa','m2')
         data_dir = string(default='')
         key_file = string(default='')
-        key_size = integer(default=-1)
+        key_size = integer(default=None)
 
 [Handlers]
   [[__many__]]
@@ -103,8 +103,12 @@ sample_rate = float
           self.__create_variable(cfg[c],section,var)
           self.__process(cfg[c],section,var)
       else:
+        if cfg[c] is None or cfg[c] == '':
+          # limitation of configobj requires defaults for non-mandatory attributes
+          # so we'll ignore the empty string and None
+          pass
         #Anything starting with $ or is a list has delayed evaluation
-        if (isinstance(cfg[c],basestring) and cfg[c][0] == '$') or isinstance(cfg[c],list):
+        elif (isinstance(cfg[c],basestring) and cfg[c][0] == '$') or isinstance(cfg[c],list):
           logging.debug("Delay evaluation for {0}".format(cfg[c]))
           self.__add_delay_eval(variable,c,cfg[c])
         elif c == 'type':
@@ -122,7 +126,7 @@ sample_rate = float
       #Substitute all variables (start with $)
       for i,j in enumerate(item):
         if j[0] == '$':
-          item[i] = self._object_map[j[1:]]
+          item[i] = self._object_map[j]
       return item
     else:
       return self._object_map[item]
@@ -144,10 +148,7 @@ sample_rate = float
     self._data_handlers = []
     self._sensor_handlers = []
 
-    self.namespaces = {'Identification' : 'identification' ,
-                       'Queue' : 'queue'}
-
-    self.types = { 'Identification' :
+    self.types = { 'Identifier' :
                   { 'name'  : 'NamedIdentifier' ,
                     'mac'  : 'MacAddressIdentifier' ,
                     'uuid' : 'UUIDIdentifier'} ,
