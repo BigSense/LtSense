@@ -9,7 +9,7 @@ class AbstractIdentifier(object):
   def __init__(self):
     object.__init__(self)
     
-  def identify():
+  def identify(self):
     return 'Unimplemented'
     
 class MacAddressIdentifier(AbstractIdentifier):
