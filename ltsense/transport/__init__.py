@@ -85,7 +85,7 @@ class QueuedTransport(AbstractTransport,Thread):
 
   def send_package(self,payload):
     """Adds the payload to the queue which is handeled by the queue thread."""
-    payload = AbstractTransport.send_package(payload)
+    payload = AbstractTransport.send_package(self,payload)
     self.queue.enqueue(payload)
 
   def _run_transport(self,payload):

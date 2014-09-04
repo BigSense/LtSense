@@ -3,7 +3,6 @@
 #import sqlite3
 import time
 from xml.dom.minidom import Document
-import fcntl, socket, struct 
 import logging
 import ltsense
 
@@ -36,12 +35,10 @@ class SenseDataHandler(AbstractDataHandler):
     err = []
 
     for s in sensors:
-      senNode = doc.createElement('sensor')
-
-      senNode = doc.createElement('sensor')
-      senNode.setAttribute('id',s.id)
-      senNode.setAttribute('type',s.type)
-      senNode.setAttribute('units',s.units)
+      sen_node = doc.createElement('sensor')
+      sen_node.setAttribute('id',s.id)
+      sen_node.setAttribute('type',s.type)
+      sen_node.setAttribute('units',s.units)
 
       ddata = doc.createElement('data')
       
@@ -50,19 +47,21 @@ class SenseDataHandler(AbstractDataHandler):
       except ltsense.sensors.SensorReadException as e:
         err.append(e.value)
  
-      senNode.appendChild(ddata)
-      sens.appendChild(senNode)
+      sen_node.appendChild(ddata)
+      sens.appendChild(sen_node)
 
     pack.appendChild(sens)
     
     #errors
+    err_list = None
     if len(err) > 0:
-      errList = doc.createElement('errors')
+      err_list = doc.createElement('errors')
     for e in err:
-      errNode = doc.createElement('error')
-      errNode.appendChild(doc.createTextNode(e))
-      errList.appendChild(errNode)
-    pack.appendChild(errList)
+      err_node = doc.createElement('error')
+      err_node.appendChild(doc.createTextNode(e))
+      err_list.appendChild(err_node)
+    if err_list is not None:
+      pack.appendChild(err_list)
     
 
     root.appendChild(pack)  

@@ -41,7 +41,7 @@ sample_rate = float
 [Handlers]
   [[__many__]]
     type = option('virtual')
-    sensors = string
+    sensors = list
 
 [Sensors]
   [[__many__]]
@@ -79,6 +79,14 @@ sample_rate = float
     else:
       logging.debug('\t>>ltsense.{0}.{1}'.format(section.lower(),self.types[section][tp]))
       self._object_map[var] = self._load_obj('{0}.{1}'.format(section.lower(),self.types[section][tp]))
+
+    #special types for the controller
+    if section == 'Data':
+      self._data_handlers.append(self._object_map[var])
+    elif section == 'Handlers':
+      self._sensor_handlers.append(self._object_map[var])
+    elif section == 'Transport':
+      self._transports.append(self._object_map[var])
 
   def __process(self,cfg,section=None,variable=None):
     """Recursively processes a configuration object"""
@@ -147,6 +155,8 @@ sample_rate = float
 
     self._data_handlers = []
     self._sensor_handlers = []
+    self._transports = []
+
 
     self.types = { 'Identifier' :
                   { 'name'  : 'NamedIdentifier' ,
@@ -177,10 +187,10 @@ sample_rate = float
     valid = True
     for (section_list, key, _) in flatten_errors(cfg, test):
       if key is not None:
-        print('Invalid value for key {0} in section {1}'.format(key,', '.join(section_list)))
+        logging.error('Invalid value for key {0} in section {1}'.format(key,', '.join(section_list)))
         valid = False
       else:
-        print('Section {0} failed validation'.format(', '.join(section_list)))
+        logging.error('Section {0} failed validation'.format(', '.join(section_list)))
         valid = False
     if not valid:
       exit(3)
@@ -189,9 +199,17 @@ sample_rate = float
     self.__process(cfg)
     self.__eval_delays()
 
-    self._controller.data_handlers = self._data_handlers
-    self._controller.sensor_handlers = self._sensor_handlers
+    logging.debug(self._data_handlers)
+    if len(self._data_handlers) != 1:
+      #TODO: Implement full data/transport/sensor mappings
+      logging.error('Currently, LtSense can only support one Data Handler. Later releases may allow mappings')
+      exit(4)
 
+    self._controller.data_handler = self._data_handlers[0]
+    self._controller.sensor_handlers = self._sensor_handlers
+    self._controller.transports = self._transports
+    logging.info("Starting Controller")
+    self._controller.start()
 
 
 

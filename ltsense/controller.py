@@ -14,7 +14,7 @@ class AbstractController(Thread):
     self.sample_rate = 10.0
     self.transports = None
     self.sensor_handlers = []
-    self.data_handlers = []
+    self.data_handler = None
 
   def run(self):
     while not ltsense.exit_all_threads:
@@ -25,16 +25,20 @@ class AbstractController(Thread):
   def process_sensor_data(self):
     sensors = []
     for h in self.sensor_handlers:
-      sensors.extend( h.sensors )
+      # if not in a list, put in a list and extend (TODO: place in a helper library?)
+      sensors.extend( [h.sensors] if type(h.sensors) == str else h.sensors )
 
-    for d in self.data_handlers:
-      d.render_data(sensors)
+    data = self.data_handler.render_data(sensors)
+
+    for t in self.transports:
+      t.send_package(data)
+
 
 class DefaultController(AbstractController):
 
   def __init__(self):
     AbstractController.__init__(self)
-    self.start()
+    #self.start()
     
 class RespawningController(AbstractController):
 
@@ -44,7 +48,7 @@ class RespawningController(AbstractController):
     # times in 10 seconds
     self.respawn_rate_limit = 10
     self.respawn_time_limit = 10
-    self.start()
+    #self.start()
 
   def run(self):
     spawn_count = 0
