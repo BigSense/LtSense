@@ -15,8 +15,6 @@ sample_rate = float
 [Data]
   [[__many__]]
     type = option('sense.xml')
-    transport = string
-    sensors = list
       [[[Identifier]]]
         type = option("name", "mac", "uuid")
         adapter = string(default='')
