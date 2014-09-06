@@ -18,7 +18,7 @@ sample_rate = float
       [[[Identifier]]]
         type = option("name", "mac", "uuid")
         adapter = string(default='')
-        name = string(default='')
+        id   = string(default='')
         file = string(default='')
 
 [Transport]
@@ -38,8 +38,8 @@ sample_rate = float
 
 [Handlers]
   [[__many__]]
-    type = option('virtual')
-    sensors = list
+    type = option('virtual','1wire/usb')
+    sensors = list(default=None)
 
 [Sensors]
   [[__many__]]

@@ -7,7 +7,8 @@ from ltsense.sensors import AbstractOneWireSensor
 
 
 ## --- Command Line Based One Wire Sensors --- ###
-
+##  Not sure if I want to get rid of this yet. Should we keep around support for counting sensors?
+"""
 class TemperatureSensor(AbstractOneWireSensor):
 
   def __init__(self,unique_id,extProc):
@@ -130,4 +131,4 @@ class WindSpeedSensor(HistoryCountingSensor):
     kph = mph * 1.609344
     return str(kph)
     
-  data = property(_read_bucket_data,lambda self,v:None )    
+  data = property(_read_bucket_data,lambda self,v:None )    """

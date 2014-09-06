@@ -15,7 +15,7 @@ class SensorReadException(Exception):
     return repr(self.value)
 
 class AbstractSensor(object):
-  "Base for all Sensors to Extend"
+  """Base for all Sensors to Extend"""
 
   def __init__(self):
     object.__init__(self)
@@ -50,8 +50,3 @@ class AbstractOneWireSensor(AbstractSensor):
 
   data = property(_read_data,lambda self,v:None)
 
-class AbstractSensorHandler(object):
-
-  def __init__(self):
-    object.__init__(self)
-    self.sensors = []
