@@ -6,11 +6,7 @@ class AbstractOwfsSensor(AbstractSensor):
   def __init__(self,ow_sensor):
     AbstractSensor.__init__(self)
     self.ow_sensor = ow_sensor
-
-  def _ow_id(self):
-    return self.ow_sensor.id
-
-  id = property(_ow_id, lambda self, v:None)
+    self.id = ow_sensor.id
 
 
 class TemperatureSensor(AbstractOwfsSensor):
