@@ -1,7 +1,7 @@
 #!/bin/sh
 
-if [[ "$1" == "" || "$2" == "" ]]; then
-  echo "Usage: build_wrt.sh <OpenWRT Toolchain Root> <Build Version>"
+if [[ "$1" == "" ]]; then
+  echo "Usage: build_wrt.sh <Build Version>"
   exit 1
 fi
 
@@ -21,14 +21,14 @@ cp etc/*.config $TARGET/etc/ltsense/examples &&
 chmod 755 $TARGET/etc/init.d/ltsense $TARGET/usr/bin/ltsense &&
 mkdir -p $TARGET/CONTROL &&
 cat >$TARGET/CONTROL/control <<EOF &&
-Package: LtSense 
-Version: $2
+Package: ltsense 
+Version: $1
 Architecture: all
 Maintainer: Sumit Khanna <sumit@penguindreams.org>
 Section: bigsense
 Priority: optional
 Description: LtSense
-Source: http://bigsens.org
+Source: http://bigsens.io
 EOF
 
-$1/host/bin/ipkg-build -o root -g root $TARGET
+ipkg-build -o root -g root $TARGET

@@ -5,9 +5,7 @@
 START=99
 STOP=10
 
-AGRAMNT=/mnt/usb
-AGRA_HOME=$AGRAMNT/ltsense
-PID=$AGRA_HOME/ltsense.pid
+PID=/var/run/ltsense.pid
 
 
 boot() {
@@ -16,30 +14,6 @@ boot() {
 
 start() {
 
-
-        # Handle mounting USB -- we need USB for all storage
-        if grep -q "[[:space:]]$AGRAMNT[[:space:]]" /proc/mounts; then
-                echo Mounted
-        else
-                echo Attempting to mount USB
-                mkdir -p /mnt/usb && mount /dev/sda1 /mnt/usb
-                if [ $? == 0 ]; then
-                        echo "USB successfully mounted"
-                else
-                        echo failed to mount usb drive to $AGRAMNT
-                        exit 2
-                fi
-        fi
-        
-        #make sure our data directories exist
-        mkdir -p $AGRA_HOME/counts &&
-        mkdir -p $AGRA_HOME/log
-         if [ $? == 0 ]; then
-           echo "LtSense directories created on USB"
-         else
-           echo "ERROR: unable to create directories on USB"
-           exit 3
-         fi        
 
         #check to see if AgraStore is running
         if [ -f "$PID" ]; then
@@ -54,7 +28,7 @@ start() {
 
         # Handle starting script
         echo Starting ltsense...
-        /usr/bin/ltsense -p $PID -d -c /etc/ltsense/gm.conf >> /mnt/usb/ltsense/log/ltsense-service.log 2>&1 &
+        /usr/bin/ltsense -p $PID -d -c /etc/ltsense/ltsense.conf >> /var/log/ltsense/ltsense-init.log 2>&1 &
         if [ $? == 0 ]; then
                 echo OK
         else
