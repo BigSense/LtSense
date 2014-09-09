@@ -1,0 +1,8 @@
+
+# Command Line Options for LtSense
+#
+#  -c configuration file
+#  -d to enable debugging
+#  -p specify a pid file location
+
+LTSENSE_OPTS=" -c /etc/ltsense/ltsense.config -d "

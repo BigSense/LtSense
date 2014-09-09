@@ -1,0 +1,8 @@
+description "ltsense sensor collection and relay service"
+
+author "Sumit Khanna<sumit@penguindreams.org> (http://bigsense.io)"
+
+start on runlevel [2345]
+stop on runlevel [016]
+
+exec /usr/bin/ltsense
