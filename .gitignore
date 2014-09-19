@@ -4,3 +4,4 @@
 build
 local
 *.ipk
+*.deb
