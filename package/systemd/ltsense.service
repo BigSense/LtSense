@@ -1,0 +1,9 @@
+#/usr/lib/systemd/system/ltsense.service
+
+[Unit]
+Description=LtSense Sensor Relay Service
+
+[Service]
+ExecStart=/usr/bin/ltsense -p /var/run/ltsense.pid
+PIDFile=/var/run/ltsense.pid
+Type=simple
