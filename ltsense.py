@@ -1,5 +1,22 @@
 #!/usr/bin/env python
+"""
+Copyright [2014] [http://bigsense.io]
 
+This file is part of LtSense.
+
+LtSense is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+LtSense is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with LtSense.  If not, see <http://www.gnu.org/licenses/>.
+"""
 from optparse import OptionParser
 import sys
 import logging
@@ -62,11 +79,11 @@ if __name__ == '__main__':
     console = logging.StreamHandler()
     console.setFormatter(logging.Formatter('%(asctime)s: %(message)s'))
     logging.getLogger('').addHandler(console)
-   
+
   if options.logfile is not None:
     logfile = logging.FileHandler(options.logfile)
     logfile.setFormatter(logging.Formatter('%(asctime)s %(levelname)-8s %(message)s'))
-    logging.getLogger('').addHandler(logfile)             
+    logging.getLogger('').addHandler(logfile)
 
 
   BootStrap(options.config)
@@ -74,4 +91,4 @@ if __name__ == '__main__':
   #controller = ltsense.loader.get_class('Controller')
   #pause for Ctrl+C Signal Handler
   signal.pause()
-   
+
