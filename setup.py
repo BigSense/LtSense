@@ -19,17 +19,18 @@ along with LtSense.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from distutils.core import setup
+import os
 
 setup(
     name='ltsense',
-    version='x.x',
+    version=os.popen('git describe --dirty').readlines(),
     packages=['ltsense'],
     author='Sumit Khanna',
     author_email='sumit@penguindreams.org',
     url='http://bigsense.io',
     license='GNU General Public License v3',
     long_description=open('README').read(),
-    script=ltsense.py
+    scripts=['scripts/ltsense'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
