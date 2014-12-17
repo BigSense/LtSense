@@ -23,7 +23,7 @@ import os
 
 setup(
     name='ltsense',
-    version=os.popen('git describe --dirty').readlines(),
+    version=os.popen('git describe --dirty').readlines()[0].strip(),
     packages=['ltsense'],
     author='Sumit Khanna',
     author_email='sumit@penguindreams.org',
