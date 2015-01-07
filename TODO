@@ -1,4 +1,0 @@
-controller.py - Finish RespawningController for use in production to respan if thread fails 
-    Threading should be in a try and catch that resets if an unexpected excpetion occurs. 
-    To prevent continuous respawning there should be a limit (n times in t time)
-    present in the config file to limit the amount of times it tries to respawn before it gives up.  
