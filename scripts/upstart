@@ -1,0 +1,17 @@
+author "Sumit Khanna <sumit@penguindreams.org>"
+description "ltsense sensor network relay daemon (http://bigsense.io)"
+version "%version"
+
+start on started networking
+stop on runlevel [!2345]
+
+env APPUSER="ltsense"
+env APPDIR="/usr/bin"
+env APPBIN="ltsense"
+env APPARGS="-c /etc/ltsense/ltsense.conf"
+
+respawn
+
+script
+  exec su - $APPUSER -c "$APPDIR/$APPBIN $APPARGS"
+end script
