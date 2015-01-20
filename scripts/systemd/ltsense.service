@@ -1,0 +1,9 @@
+[Unit]
+Description=ltsense sensor collection and relay service
+
+[Service]
+ExecStart=/usr/bin/ltsense -c /etc/ltsense/ltsense.conf -p /var/run/ltsense.pid
+Type=simple
+User=ltsense
+Group=ltsense
+PIDFile=/var/run/ltsense.pid

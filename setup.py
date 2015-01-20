@@ -20,6 +20,17 @@ along with LtSense.  If not, see <http://www.gnu.org/licenses/>.
 
 from distutils.core import setup
 import os
+import platform
+import os
+
+def init_file():
+    distro = os.getenv('DISTRO',platform.dist()[0])
+    if distro == 'Ubuntu':
+        return ('/etc/init/', ['scripts/upstart/ltsense.conf'])
+    elif distro in ['debian']:
+        return ('/etc/init.d/', ['scripts/systemv/ltsense'])
+    elif distro in ['centos', 'redhat', 'fedora']:
+        return ('/lib/systemd/system/', ['scripts/systemd/ltsense.service'])
 
 setup(
     name='ltsense',
@@ -30,6 +41,7 @@ setup(
     url='http://bigsense.io',
     license='GNU General Public License v3',
     long_description=open('README').read(),
+    data_files=[init_file()],
     scripts=['scripts/ltsense'],
     classifiers=[
         'Development Status :: 4 - Beta',
