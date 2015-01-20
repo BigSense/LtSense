@@ -49,8 +49,8 @@ def logfile_arg():
   return func
 
 
-if __name__ == '__main__':
-
+def main():
+  """ltsense entry point."""
   parser = OptionParser(usage="%prog [-dvq] [-l <logfile>] [-c config ]",
                          description="%prog sensor relay service.\n", version="%prog {}".format(ltsense.sense_version()), epilog='Copyright 2011-2014 Sumit Khanna. http://BigSense.io')
   parser.add_option('-d','--debug',action='store_true',help='show additional debugging output')
@@ -92,3 +92,5 @@ if __name__ == '__main__':
   #pause for Ctrl+C Signal Handler
   signal.pause()
 
+if __name__ == '__main__':
+  main()

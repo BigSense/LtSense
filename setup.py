@@ -18,10 +18,9 @@ You should have received a copy of the GNU General Public License
 along with LtSense.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from distutils.core import setup
+from setuptools import setup
 import os
 import platform
-import os
 
 def init_file():
     distro = os.getenv('DISTRO',platform.dist()[0])
@@ -42,7 +41,7 @@ setup(
     license='GNU General Public License v3',
     long_description=open('README').read(),
     data_files=[init_file()],
-    scripts=['scripts/ltsense'],
+    entry_points={'console_scripts': ['ltsense=ltsense.__main__:main']},
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
