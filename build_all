@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 mkdir -p package/{deb-systemv,deb-upstart,rpm-systemd}
 
