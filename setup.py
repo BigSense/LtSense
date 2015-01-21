@@ -54,5 +54,6 @@ setup(
         'Natural Language :: English',
         'Operating System :: POSIX :: Linux',
         'Topic :: Scientific/Engineering :: GIS',
-    ]
+    ],
+    install_requires=['configobj>=4.7.2']
 )
