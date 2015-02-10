@@ -1,10 +1,10 @@
 from ltsense.sensors import AbstractSensor
-import ow
 
 class AbstractOwfsSensor(AbstractSensor):
 
   def __init__(self,ow_sensor):
     AbstractSensor.__init__(self)
+    import ow
     self.ow_sensor = ow_sensor
     self.id = ow_sensor.id
 
