@@ -6,3 +6,4 @@ local
 *.ipk
 *.deb
 package/
+ltsense.egg-info/
