@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License
 along with LtSense.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from setuptools import setup
+from setuptools import setup, find_packages
 import os
 import platform
 
@@ -34,7 +34,7 @@ def init_file():
 setup(
     name='ltsense',
     version=os.popen('git describe --dirty').readlines()[0].strip(),
-    packages=['ltsense'],
+    packages=find_packages(),
     author='Sumit Khanna',
     author_email='sumit@penguindreams.org',
     maintainer='Sumit Khanna',
