@@ -2,6 +2,11 @@
 
 mkdir -p package/{deb-systemv,deb-upstart,rpm-systemd}
 
-DISTRO=Ubuntu fpm -p package/deb-upstart -f -t deb -s python --python-install-lib /usr/lib/python2.7/dist-packages --python-bin=$(which python2.7) --no-python-fix-name setup.py
-DISTRO=centos fpm -p package/rpm-systemd -f -t rpm -s python --python-install-lib /usr/lib/python2.7/site-packages --python-bin=$(which python2.7) --no-python-fix-name setup.py
-DISTRO=debian fpm -p package/deb-systemv -f -t deb -s python --python-install-lib /usr/lib/python2.7/dist-packages --python-bin=$(which python2.7) --no-python-fix-name setup.py
+install_scripts=" --before-install scripts/pre-install  "
+python_args() {
+  echo " -s python --python-install-lib /usr/lib/python2.7/$1 --python-bin=$(which python2.7) --no-python-fix-name "
+}
+
+DISTRO=Ubuntu fpm -p package/deb-upstart -f -t deb $(python_args dist-packages) $install_scripts setup.py
+DISTRO=centos fpm -p package/rpm-systemd -f -t rpm $(python_args site-packages) $install_scripts setup.py
+DISTRO=debian fpm -p package/deb-systemv -f -t deb $(python_args dist-packages) $install_scripts setup.py

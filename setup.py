@@ -43,7 +43,9 @@ setup(
     license='GNU General Public License v3',
     description='ltsense sensor collection and relay service',
     long_description=open('README').read(),
-    data_files=[init_file()],
+    data_files=[init_file(),
+                ('/etc/ltsense/examples',['etc/virtual-ltsense.conf','etc/onewire-ltsense.conf'])
+               ],
     entry_points={'console_scripts': ['ltsense=ltsense.__main__:main']},
     classifiers=[
         'Development Status :: 4 - Beta',
