@@ -23,4 +23,3 @@ def sense_version():
         return get_distribution('ltsense').version
     except DistributionNotFound:
         return os.popen('git describe --dirty').readlines()[0].strip()
-

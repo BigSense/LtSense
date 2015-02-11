@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Copyright [2014] [http://bigsense.io]
+Copyright [2015] [http://bigsense.io]
 
 This file is part of LtSense.
 
@@ -22,8 +22,9 @@ from setuptools import setup, find_packages
 import os
 import platform
 
+
 def init_file():
-    distro = os.getenv('DISTRO',platform.dist()[0])
+    distro = os.getenv('DISTRO', platform.dist()[0])
     if distro == 'Ubuntu':
         return ('/etc/init/', ['scripts/upstart/ltsense.conf'])
     elif distro in ['debian']:
@@ -44,8 +45,9 @@ setup(
     description='ltsense sensor collection and relay service',
     long_description=open('README').read(),
     data_files=[init_file(),
-                ('/etc/ltsense/examples',['etc/virtual-ltsense.conf','etc/onewire-ltsense.conf'])
-               ],
+                ('/etc/ltsense/examples', ['etc/virtual-ltsense.conf',
+                                           'etc/onewire-ltsense.conf'])
+                ],
     entry_points={'console_scripts': ['ltsense=ltsense.__main__:main']},
     classifiers=[
         'Development Status :: 4 - Beta',
