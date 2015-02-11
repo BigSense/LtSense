@@ -56,7 +56,7 @@ def main():
   parser.add_option('-d','--debug',action='store_true',help='show additional debugging output')
   parser.add_option('-l','--logfile',action='callback',callback=logfile_arg(),help='store output to logfile [default: var/log/%s_yyyy-mm-dd-hhmmss.log]' % basename(sys.argv[0]),metavar='FILE',dest='logfile')
   parser.add_option('-c','--config',action='store',dest='config',help='configuration file [default: %default]',default='etc/gm.config')
-  parser.add_option('-p','--pid',action='store',help='location to store PID [default: %default]',dest='pidfile',default='ltsense.pid')
+  parser.add_option('-p','--pid',action='store',help='location to store PID', dest='pidfile')
   parser.set_defaults(verbose=True)
   parser.add_option('-v', action='store_true', dest='verbose', help='verbose output (default, combine with -d for additional information)')
   parser.add_option('-q', action='store_false', dest='verbose', help='run silent')
