@@ -21,6 +21,7 @@ along with LtSense.  If not, see <http://www.gnu.org/licenses/>.
 from setuptools import setup, find_packages
 import os
 import platform
+import math
 
 
 def init_system():
@@ -29,12 +30,18 @@ def init_system():
     Example: (('/etc/init/', ['scripts/upstart/ltsense.conf']),'~upstart')
     """
     distro = os.getenv('DISTRO', platform.linux_distribution()[0])
+    release = os.getenv('RELEASE', platform.linux_distribution()[1])
     if distro == 'Ubuntu':
         return (('/etc/init/', ['scripts/upstart/ltsense.conf']),
                 '~upstart')
     elif distro in ['debian']:
-        return (('/etc/init.d/', ['scripts/systemv/ltsense']),
-               '~systemv')
+        release_int = int(math.floor(float(release)))
+        if release_int == 7:
+            return (('/etc/init.d/', ['scripts/systemv/ltsense']),
+                   '~systemv')
+        elif release_int == 8:
+            return (('/lib/systemd/system/', ['scripts/systemd/ltsense.service']),
+                   '~systemd')
     elif distro in ['centos', 'redhat', 'fedora']:
         return (('/lib/systemd/system/', ['scripts/systemd/ltsense.service']),'')
 

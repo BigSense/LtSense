@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mkdir -p package/{deb-systemv,deb-upstart,rpm-systemd}
+mkdir -p package/{deb-systemv,deb-upstart,rpm-systemd,deb-systemd}
 
 install_scripts=" --before-install scripts/pre-install  "
 python_args() {
@@ -9,4 +9,5 @@ python_args() {
 
 DISTRO=Ubuntu fpm -p package/deb-upstart -f -t deb $(python_args dist-packages) $install_scripts setup.py
 DISTRO=centos fpm -p package/rpm-systemd -f -t rpm $(python_args site-packages) $install_scripts setup.py
-DISTRO=debian fpm -p package/deb-systemv -f -t deb $(python_args dist-packages) $install_scripts setup.py
+RELEASE=7 DISTRO=debian fpm -p package/deb-systemv -f -t deb $(python_args dist-packages) $install_scripts setup.py
+RELEASE=8 DISTRO=debian fpm -p package/deb-systemd -f -t deb $(python_args dist-packages) $install_scripts setup.py
