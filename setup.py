@@ -23,18 +23,24 @@ import os
 import platform
 
 
-def init_file():
-    distro = os.getenv('DISTRO', platform.dist()[0])
+def init_system():
+    """
+    Returns a tuple of init data files and a version suffix (deb only).
+    Example: (('/etc/init/', ['scripts/upstart/ltsense.conf']),'~upstart')
+    """
+    distro = os.getenv('DISTRO', platform.linux_distribution()[0])
     if distro == 'Ubuntu':
-        return ('/etc/init/', ['scripts/upstart/ltsense.conf'])
+        return (('/etc/init/', ['scripts/upstart/ltsense.conf']),
+                '~upstart')
     elif distro in ['debian']:
-        return ('/etc/init.d/', ['scripts/systemv/ltsense'])
+        return (('/etc/init.d/', ['scripts/systemv/ltsense']),
+               '~systemv')
     elif distro in ['centos', 'redhat', 'fedora']:
-        return ('/lib/systemd/system/', ['scripts/systemd/ltsense.service'])
+        return (('/lib/systemd/system/', ['scripts/systemd/ltsense.service']),'')
 
 setup(
     name='ltsense',
-    version=os.popen('git describe --dirty').readlines()[0].strip(),
+    version='{}{}'.format(os.popen('git describe --dirty').readlines()[0].strip(),init_system()[1]),
     packages=find_packages(),
     author='Sumit Khanna',
     author_email='sumit@penguindreams.org',
@@ -44,7 +50,7 @@ setup(
     license='GNU General Public License v3',
     description='ltsense sensor collection and relay service',
     long_description=open('README').read(),
-    data_files=[init_file(),
+    data_files=[init_system()[0],
                 ('/etc/ltsense/examples', ['etc/virtual-ltsense.conf',
                                            'etc/onewire-ltsense.conf'])
                 ],
