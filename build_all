@@ -1,6 +1,9 @@
 #!/bin/bash
 
-mkdir -p package/{deb-systemv,deb-upstart,rpm-systemd,deb-systemd}
+echo "Cleaning package directory"
+rm -rf package/* &> /dev/null
+echo "Creating package directories"
+mkdir -vp package/{deb-systemv,deb-upstart,rpm-systemd,deb-systemd}
 
 install_scripts=" --before-install scripts/pre-install  "
 python_args() {
