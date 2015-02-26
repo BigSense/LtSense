@@ -5,7 +5,7 @@ rm -rf package/* &> /dev/null
 echo "Creating package directories"
 mkdir -vp package/{deb-systemv,deb-upstart,rpm-systemd,deb-systemd}
 
-install_scripts=" --before-install scripts/pre-install  "
+install_scripts=" --before-install scripts/pre-install --after-install scripts/post-install "
 python_args() {
   echo " -s python --python-install-lib /usr/lib/python2.7/$1 --python-bin=$(which python2.7) --no-python-fix-name --python-install-bin /usr/bin"
 }
