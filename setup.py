@@ -38,16 +38,16 @@ def init_system():
         release_int = int(math.floor(float(release)))
         if release_int == 7:
             return (('/etc/init.d/', ['scripts/systemv/ltsense']),
-                   '~systemv')
+                    '~systemv')
         elif release_int == 8:
             return (('/lib/systemd/system/', ['scripts/systemd/ltsense.service']),
-                   '~systemd')
+                    '~systemd')
     elif distro in ['centos', 'redhat', 'fedora']:
-        return (('/lib/systemd/system/', ['scripts/systemd/ltsense.service']),'')
+        return (('/lib/systemd/system/', ['scripts/systemd/ltsense.service']), '')
 
 setup(
     name='ltsense',
-    version='{}{}'.format(os.popen('git describe --dirty').readlines()[0].strip(),init_system()[1]),
+    version='{}{}'.format(os.popen('git describe --dirty').readlines()[0].strip(), init_system()[1]),
     packages=find_packages(),
     author='Sumit Khanna',
     author_email='sumit@penguindreams.org',
@@ -72,5 +72,5 @@ setup(
         'Operating System :: POSIX :: Linux',
         'Topic :: Scientific/Engineering :: GIS',
     ],
-    install_requires=['configobj>=4.7.2', 'pkg-resources']
+    install_requires=['configobj>=4.7.2']
 )
