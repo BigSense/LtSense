@@ -1,4 +1,4 @@
 #!/bin/bash
 /usr/sbin/useradd --user-group --system -d /var/lib/ltsense -s /bin/false --no-create-home -c 'ltsense daemon' ltsense
-mkdir -p /var/log/ltsense
-chown -R ltsense:ltsense /var/log/ltsense
+mkdir -p /var/{lib,log}/ltsense
+chown -R ltsense:ltsense /var/{lib,log}/ltsense
