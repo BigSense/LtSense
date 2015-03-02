@@ -35,12 +35,12 @@ class ImageSensor(AbstractSensor):
         AbstractSensor.__init__(self)
         self.id = 'UnknownVirtualCamera'
         self.type = 'Image'
-        self.units = 'NImageU'  # Non-Comissioned Photo Units
-        self._imageFile = ''
+        self.units = 'Image'  # Non-Comissioned Photo Units
+        self._image_file = ''
         self._image = None
 
     def _set_image(self, pfile):
-        self._imageFile = pfile
+        self._image_file = pfile
         fd = open(pfile, 'rb')
         self._image = fd.read()
         fd.close()
@@ -49,7 +49,7 @@ class ImageSensor(AbstractSensor):
         return base64.b64encode(self._image)
 
     data = property(_get_mime64_image, lambda self, v: None)
-    imageFile = property(lambda self: self._imageFile, _set_image)
+    image_file = property(lambda self: self._image_file, _set_image)
 
 
 class IncrementingSensor(AbstractSensor):
