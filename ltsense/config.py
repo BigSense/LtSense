@@ -168,7 +168,7 @@ sample_rate = float
                       'Data':
                       {'sense.xml': 'SenseDataHandler'},
                       'Sensors':
-                      {'virtual/temp': 'virtual.RandomSensor',
+                      {'virtual/temp': 'virtual.VirtualTemperatureSensor',
                        'virtual/image': 'virtual.ImageSensor'},
                       'Handlers':
                       {'virtual': 'GeneralSensorHandler',

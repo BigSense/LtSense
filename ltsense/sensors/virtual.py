@@ -29,6 +29,15 @@ class RandomSensor(AbstractSensor):
     data = property(_random, lambda self, v: None)
 
 
+class VirtualTemperatureSensor(RandomSensor):
+
+    def __init__(self):
+        RandomSensor.__init__(self)
+        self.id = "Unspecified"
+        self.type = "Temperature"
+        self.units = "C"
+
+
 class ImageSensor(AbstractSensor):
 
     def __init__(self):
