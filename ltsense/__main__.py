@@ -17,6 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with LtSense.  If not, see <http://www.gnu.org/licenses/>.
 """
+from __future__ import print_function
 from optparse import OptionParser
 import sys
 import logging
@@ -58,13 +59,19 @@ def main():
     parser.add_option('-l', '--logfile', action='callback', callback=logfile_arg(),
                       help='store output to logfile [default: var/log/%s_yyyy-mm-dd-hhmmss.log]' % basename(sys.argv[0]),
                       metavar='FILE', dest='logfile')
-    parser.add_option('-c', '--config', action='store', dest='config', help='configuration file [default: %default]', default='etc/gm.config')
+    parser.add_option('-c', '--config', action='store', dest='config', help='configuration file (required)')
     parser.add_option('-p', '--pid', action='store', help='location to store PID', dest='pidfile')
     parser.set_defaults(verbose=True)
     parser.add_option('-v', action='store_true', dest='verbose', help='verbose output (default, combine with -d for additional information)')
     parser.add_option('-q', action='store_false', dest='verbose', help='run silent')
 
     (options, args) = parser.parse_args()
+
+    # configuration file is required
+    if options.config is None:
+        print("Configuration File (-c) is required", file=sys.stderr)
+        parser.print_help()
+        exit(1)
 
     # pid file
     if options.pidfile is not None:
