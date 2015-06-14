@@ -20,6 +20,12 @@ sample_rate = float
         adapter = string(default='')
         id   = string(default='')
         file = string(default='')
+      [[[Location]]]
+        type = option("virtual", "gps")
+        x = string(default='')
+        y = string(default='')
+        accuracy = string(default='')
+        altitude = string(default='')
 
 [Transport]
   [[__many__]]
@@ -157,6 +163,9 @@ sample_rate = float
                       {'name': 'NamedIdentifier',
                        'mac': 'MacAddressIdentifier',
                        'uuid': 'UUIDIdentifier'},
+                      'Location':
+                      {'virtual': 'VirtualLocation',
+                       'gps': 'GPSLocation'},
                       'Queue':
                       {'memory': 'MemoryQueue',
                        'sqlite': 'SQLiteQueue'},

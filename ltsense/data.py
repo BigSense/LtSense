@@ -11,6 +11,7 @@ class AbstractDataHandler(object):
     def __init__(self):
         object.__init__(self)
         self.identifier = None
+        self.location = None
 
     def render_data(self, sensors):
         pass
@@ -30,6 +31,17 @@ class SenseDataHandler(AbstractDataHandler):
         # time.time() is seconds as a float
         pack.setAttribute("timestamp", "%d" % round(time.time() * 1000))
         pack.setAttribute("id", self.identifier.identify())
+
+        # Location
+        if self.location is not None:
+            loc = self.location.location()
+            if loc is not None:
+                xml_loc = doc.createElement('location')
+                xml_loc.setAttribute('x', loc['x'])
+                xml_loc.setAttribute('y', loc['y'])
+                xml_loc.setAttribute('accuracy', loc['accuracy'])
+                xml_loc.setAttribute('altitude', loc['altitude'])
+                pack.appendChild(xml_loc)
 
         sens = doc.createElement('sensors')
 
