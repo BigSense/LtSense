@@ -1,5 +1,20 @@
-Prototype for Greenstation Project
+LtSense - Sensor Relay Daemon
+=============================
+
+LtSense (pronounced "Little Sense") is a daemon that collects data from sensors and relays them to BigSense.
+
+For more information, visit http://bigsense.io
+
+
+Notes
+=====
+
+For running in development mode:
+
+    python2 -m ltsense
+
+Author
+======
 
 Sumit Khanna
-
 http://penguindreams.org
