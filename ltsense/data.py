@@ -24,7 +24,7 @@ class SenseDataHandler(AbstractDataHandler):
 
     def render_data(self, sensors):
         doc = Document()
-        root = doc.createElement('AgraData')
+        root = doc.createElement('sensedata')
 
         pack = doc.createElement('package')
         # Webservice expects time as a long in miliseconds.
