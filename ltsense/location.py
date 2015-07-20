@@ -1,5 +1,9 @@
 #!/usr/bin/env/python
 
+from threading import Thread
+from gps import gps, WATCH_ENABLE
+import logging
+import time
 
 class AbstractLocation(object):
 
@@ -30,8 +34,29 @@ class VirtualLocation(AbstractLocation):
         self.location_ready = True
 
 
-class GPSLocation(AbstractLocation):
+class GPSLocation(AbstractLocation, Thread):
 
     def __init__(self):
-        #TODO: start thread to connect to GPS daemon
-        pass
+        AbstractLocation.__init__(self)
+        Thread.__init__(self)
+        self._gps = gps(mode=WATCH_ENABLE)
+        self.location_ready = False
+        self.poll_rate = 1.0
+        self.start()
+        logging.info("GPS Location Thread Activated")
+
+    def run(self):
+        try:
+            while True:
+                report = self._gps.next()
+                # Wait for a 3D Fix
+                if report['class'] == 'TPV' and report['mode'] == 3:
+                    self.x = str(report.lon)
+                    self.y = str(report.lat)
+                    self.altitude = str(report.alt)
+                    self.accuracy = str(1)
+                    self.location_ready = True
+                time.sleep(self.poll_rate)
+        except StopIteration:
+            logging.error('GPS Thread Stopped')
+            self.location_ready = False
