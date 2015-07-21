@@ -10,8 +10,8 @@ class AbstractLocation(object):
     def __init__(self):
         object.__init__(self)
         self.location_ready = False
-        self.x = 0
-        self.y = 0
+        self.longitude = 0
+        self.latitude = 0
         self.accuracy = 0
         self.altitude = 0
 
@@ -25,7 +25,7 @@ class AbstractLocation(object):
         if not self.location_ready:
             return None
         else:
-            return { 'x': self.x, 'y': self.y, 'accuracy': self.accuracy, 'altitude': self.altitude }
+            return { 'longitude': self.longitude, 'latitude': self.latitude, 'accuracy': self.accuracy, 'altitude': self.altitude }
 
 
 class VirtualLocation(AbstractLocation):
@@ -51,8 +51,8 @@ class GPSLocation(AbstractLocation, Thread):
                 report = self._gps.next()
                 # Wait for a 3D Fix
                 if report['class'] == 'TPV' and report['mode'] == 3:
-                    self.x = str(report.lon)
-                    self.y = str(report.lat)
+                    self.longitude = str(report.lon)
+                    self.latitude = str(report.lat)
                     self.altitude = str(report.alt)
                     self.accuracy = str(1)
                     self.location_ready = True

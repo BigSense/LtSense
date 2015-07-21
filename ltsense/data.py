@@ -37,8 +37,8 @@ class SenseDataHandler(AbstractDataHandler):
             loc = self.location.location()
             if loc is not None:
                 xml_loc = doc.createElement('location')
-                xml_loc.setAttribute('x', loc['x'])
-                xml_loc.setAttribute('y', loc['y'])
+                xml_loc.setAttribute('longitude', loc['longitude'])
+                xml_loc.setAttribute('latitude', loc['latitude'])
                 xml_loc.setAttribute('accuracy', loc['accuracy'])
                 xml_loc.setAttribute('altitude', loc['altitude'])
                 pack.appendChild(xml_loc)
