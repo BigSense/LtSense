@@ -4,6 +4,7 @@ from threading import Thread
 from gps import gps, WATCH_ENABLE
 import logging
 import time
+import ltsense
 
 class AbstractLocation(object):
 
@@ -47,7 +48,7 @@ class GPSLocation(AbstractLocation, Thread):
 
     def run(self):
         try:
-            while True:
+            while not ltsense.exit_all_threads:
                 report = self._gps.next()
                 # Wait for a 3D Fix
                 if report['class'] == 'TPV' and report['mode'] == 3:
