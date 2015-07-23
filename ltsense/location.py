@@ -56,7 +56,14 @@ class GPSLocation(AbstractLocation, Thread):
                     self.latitude = str(report.lat)
                     self.altitude = str(report.alt)
                     self.accuracy = str(1)
+                    if not self.location_ready:
+                        logging.info('GPS 3D Lock Acquired')
                     self.location_ready = True
+                # We've lost our GPS fix. Stop adding Location info
+                elif report['class'] == 'TPV' and report['mode'] != 3:
+                    if self.location_ready:
+                        logging.info('GPS 3D Lock Lost')    
+                    self.location_ready = False                
                 time.sleep(self.poll_rate)
         except StopIteration:
             logging.error('GPS Thread Stopped')
