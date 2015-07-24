@@ -42,7 +42,7 @@ class GPSLocation(AbstractLocation, Thread):
         Thread.__init__(self)
         self._gps = gps(mode=WATCH_ENABLE)
         self.location_ready = False
-        self.poll_rate = 1.0
+        self.poll_rate = 0.3
         self.start()
         logging.info("GPS Location Thread Activated")
 
