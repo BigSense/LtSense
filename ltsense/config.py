@@ -22,8 +22,8 @@ sample_rate = float
         file = string(default='')
       [[[Location]]]
         type = option("virtual", "gps")
-        x = string(default='')
-        y = string(default='')
+        longitude = string(default='')
+        latitude = string(default='')
         accuracy = string(default='')
         altitude = string(default='')
 
