@@ -24,8 +24,16 @@ sample_rate = float
         type = option("virtual", "gps")
         longitude = string(default='')
         latitude = string(default='')
-        accuracy = string(default='')
         altitude = string(default='')
+        speed = string(default='')
+        climb = string(default='')
+        track = string(default='')
+        longutide_error = string(default='')
+        latitude_error = string(default='')
+        altitude_error = string(default='')
+        speed_error = string(default='')
+        climb_track = string(default='')
+        track_error = string(default='')
 
 [Transport]
   [[__many__]]

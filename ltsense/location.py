@@ -13,20 +13,39 @@ class AbstractLocation(object):
         self.location_ready = False
         self.longitude = 0
         self.latitude = 0
-        self.accuracy = 0
         self.altitude = 0
+        self.speed = 0
+        self.climb = 0
+        self.track = 0
+        self.longitude_error = 0
+        self.latitude_error = 0
+        self.altitude_error = 0
+        self.speed_error = 0
+        self.climb_error = 0 
+        self.track_error = 0
 
 
     def location(self):
         """
-        Returns a dictionary with {x, y, accuracy, altitude} or None.
+        Returns a dictionary with {longitude, latitude, altitude,
+        speed, climb, track, longitude_error, latitude_error, 
+        altitude_error, speed_error, climb_error, 
+        track_error} or None.
         This should return immediately. Population of GPS data
         should occur in a seperate thread. 
         """
         if not self.location_ready:
             return None
         else:
-            return { 'longitude': self.longitude, 'latitude': self.latitude, 'accuracy': self.accuracy, 'altitude': self.altitude }
+            return { 'longitude': self.longitude, 'latitude': self.latitude, 
+                     'altitude': self.altitude, 'speed': self.speed,
+                     'climb': self.climb, 'track': self.track,
+                     'longitude_error': self.longitude_error, 
+                     'latitude_error': self.latitude_error,
+                     'altitude_error': self.altitude_error,
+                     'speed_error': self.speed_error,
+                     'climb_error': self.climb_error,
+                     'track_error': self.track_error }
 
 
 class VirtualLocation(AbstractLocation):
@@ -52,10 +71,18 @@ class GPSLocation(AbstractLocation, Thread):
                 report = self._gps.next()
                 # Wait for a 3D Fix
                 if report['class'] == 'TPV' and report['mode'] == 3:
-                    self.longitude = str(report.lon)
-                    self.latitude = str(report.lat)
-                    self.altitude = str(report.alt)
-                    self.accuracy = str(1)
+                    self.longitude = str(report.lon) if 'lon' in report else ''
+                    self.latitude = str(report.lat) if 'lat' in report else ''
+                    self.altitude = str(report.alt) if 'alt' in report else ''
+                    self.speed = str(report.speed) if 'speed' in report else ''
+                    self.track = str(report.track) if 'track' in report else ''
+                    self.climb = str(report.climb) if 'climb' in report else ''
+                    self.longitude_error = str(report.epx) if 'epx' in report else ''
+                    self.latitude_error = str(report.epy) if 'epy' in report else ''
+                    self.altitude_error = str(report.epv) if 'epv' in report else ''
+                    self.speed_error = str(report.eps) if 'eps' in report else ''
+                    self.climb_error = str(report.epc) if 'epc' in report else ''
+                    self.track_error = str(report.epd) if 'epd' in report else ''
                     if not self.location_ready:
                         logging.info('GPS 3D Lock Acquired')
                     self.location_ready = True
