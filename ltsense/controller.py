@@ -27,7 +27,8 @@ class AbstractController(Thread):
         sensors = []
         for h in self.sensor_handlers:
             # if not in a list, put in a list and extend (TODO: place in a helper library?)
-            sensors.extend([h.sensors] if type(h.sensors) == str else h.sensors)
+            if h.sensors is not None:
+                sensors.extend([h.sensors] if type(h.sensors) == str else h.sensors)
 
         data = self.data_handler.render_data(sensors)
 

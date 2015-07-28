@@ -1,6 +1,6 @@
 # --- Sensor Handlers --- #
 from ltsense.sensors.owfs import TemperatureSensor
-
+import logging
 
 class AbstractSensorHandler(object):
 
@@ -20,10 +20,13 @@ class OWFSSensorHandler(AbstractSensorHandler):
     def _sensors(self):
         import ow
         sensors = []
-        for s in ow.Sensor('/').sensorList():
-            if s.family == '28' or s.family == '10':
-                sensors.append(TemperatureSensor(s))
-        return sensors
+        try:
+            for s in ow.Sensor('/').sensorList():
+                if s.family == '28' or s.family == '10':
+                     sensors.append(TemperatureSensor(s))
+            return sensors
+        except ow.exUnknownSensor as e:
+            logging.warn('Error Reading 1-Wire: {}'.format(e))
 
     sensors = property(_sensors, lambda self, v: None)
 
