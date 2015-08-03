@@ -52,8 +52,9 @@ sample_rate = float
 
 [Handlers]
   [[__many__]]
-    type = option('virtual','1wire/usb')
+    type = option('virtual','1wire')
     sensors = list(default=None)
+    device = string(default=None)
 
 [Sensors]
   [[__many__]]
@@ -189,7 +190,7 @@ sample_rate = float
                        'virtual/image': 'virtual.ImageSensor'},
                       'Handlers':
                       {'virtual': 'GeneralSensorHandler',
-                       '1wire/usb': 'OWFSSensorHandler'},
+                       '1wire': 'OWFSSensorHandler'},
                       }
 
         cfg = ConfigObj(filename, configspec=BootStrap.config_specification.split('\n'))

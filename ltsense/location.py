@@ -11,18 +11,18 @@ class AbstractLocation(object):
     def __init__(self):
         object.__init__(self)
         self.location_ready = False
-        self.longitude = 0
-        self.latitude = 0
-        self.altitude = 0
-        self.speed = 0
-        self.climb = 0
-        self.track = 0
-        self.longitude_error = 0
-        self.latitude_error = 0
-        self.altitude_error = 0
-        self.speed_error = 0
-        self.climb_error = 0 
-        self.track_error = 0
+        self.longitude = ''
+        self.latitude = ''
+        self.altitude = ''
+        self.speed = ''
+        self.climb = ''
+        self.track = ''
+        self.longitude_error = ''
+        self.latitude_error = ''
+        self.altitude_error = ''
+        self.speed_error = ''
+        self.climb_error = ''
+        self.track_error = ''
 
 
     def location(self):
@@ -51,6 +51,7 @@ class AbstractLocation(object):
 class VirtualLocation(AbstractLocation):
 
     def __init__(self):
+        AbstractLocation.__init__(self)
         self.location_ready = True
 
 

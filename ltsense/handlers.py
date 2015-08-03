@@ -14,11 +14,18 @@ class OWFSSensorHandler(AbstractSensorHandler):
     def __init__(self):
         AbstractSensorHandler.__init__(self)
         # Avoid a direct dependency
+        self.device = 'u'
+        self._connected = False
+
+    def _ensure_connect(self):
         import ow
-        ow.init('u')
+        if not self._connected:
+            ow.init(self.device)
+            self._connected = True
 
     def _sensors(self):
         import ow
+        self._ensure_connect()
         sensors = []
         try:
             for s in ow.Sensor('/').sensorList():
