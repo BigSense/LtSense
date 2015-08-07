@@ -1,7 +1,6 @@
 #!/usr/bin/env/python
 
 from threading import Thread
-from gps import gps, WATCH_ENABLE
 import logging
 import time
 import ltsense
@@ -58,6 +57,7 @@ class VirtualLocation(AbstractLocation):
 class GPSLocation(AbstractLocation, Thread):
 
     def __init__(self):
+        from gps import gps, WATCH_ENABLE
         AbstractLocation.__init__(self)
         Thread.__init__(self)
         self._gps = gps(mode=WATCH_ENABLE)
