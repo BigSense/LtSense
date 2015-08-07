@@ -1,0 +1,6 @@
+SUBSYSTEM!="usb_device", ACTION!="add", GOTO="ltsense_rules_end"
+
+# DS2490 1-Wire adapter 
+ATTRS{idVendor}=="04fa", ATTRS{idProduct}=="2490", MODE="660", GROUP="ltsense"
+
+LABEL="ltsense_rules_end"

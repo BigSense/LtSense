@@ -3,3 +3,6 @@
 if [ -f /etc/init.d/ltsense ]; then
   chmod 755 /etc/init.d/ltsense
 fi
+if [ -x /sbin/udevadm ]; then
+  /sbin/udevadm control --reload-rules
+fi

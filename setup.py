@@ -59,7 +59,8 @@ setup(
     long_description=open('README').read(),
     data_files=[init_system()[0],
                 ('/etc/ltsense/examples', ['etc/virtual-ltsense.conf',
-                                           'etc/onewire-ltsense.conf'])
+                                           'etc/onewire-ltsense.conf']),
+                ('/etc/udev/rules.d', ['scripts/ltsense.rules'])
                 ],
     entry_points={'console_scripts': ['ltsense=ltsense.__main__:main']},
     classifiers=[
