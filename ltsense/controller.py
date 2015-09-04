@@ -12,7 +12,7 @@ class AbstractController(Thread):
     def __init__(self):
         Thread.__init__(self)
 
-        self.sample_rate = 10.0
+        self.sample_rate = 10
         self.transports = None
         self.sensor_handlers = []
         self.data_handler = None
@@ -20,7 +20,11 @@ class AbstractController(Thread):
     def run(self):
         while not ltsense.exit_all_threads:
             self.process_sensor_data()
-            time.sleep(float(self.sample_rate))
+            for i in range(int(self.sample_rate)):
+                if ltsense.exit_all_threads:
+                    break
+                else:
+                    time.sleep(1)
         logging.info('Exit Detected. Stopping Controller Thread')
 
     def process_sensor_data(self):

@@ -33,7 +33,7 @@ class MemoryQueue(AbstractQueue):
 
     def dequeue(self):
         try:
-            return self.__queue.get(self.queue_timeout)
+            return self.__queue.get(False, self.queue_timeout)
         except Empty:
             return None
 
