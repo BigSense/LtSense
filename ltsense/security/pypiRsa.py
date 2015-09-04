@@ -34,6 +34,7 @@ class RSASecurity(DataSecurity):
                     # reread the file we just wrote
                     with open(key_path) as fd:
                         self._key = rsa.PrivateKey.load_pkcs1(fd.read())
+                    self.ready = True
 
     def sign_data(self, data):
         return base64.b64encode(rsa.sign(data, self._key, 'SHA-1')).decode('UTF-8')

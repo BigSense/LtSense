@@ -28,9 +28,8 @@ class AbstractTransport(object):
             return payload
 
     def _init_security(self, security):
-        if self._security is not None:
-            self._security = security
-            security.initalize_security()
+        self._security = security
+        security.initalize_security()
 
     security = property(lambda self: self._security, lambda self, value: self._init_security(value))
 

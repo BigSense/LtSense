@@ -73,5 +73,5 @@ setup(
         'Operating System :: POSIX :: Linux',
         'Topic :: Scientific/Engineering :: GIS',
     ],
-    install_requires=['configobj>=4.7.2', 'setuptools']
+    install_requires=['configobj>=4.7.2', 'setuptools', 'rsa']
 )
