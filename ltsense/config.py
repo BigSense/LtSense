@@ -21,7 +21,7 @@ sample_rate = float
         id   = string(default='')
         file = string(default='')
       [[[Location]]]
-        type = option("virtual", "gps")
+        type = option("virtual", "gps", "none", default="none")
         longitude = string(default='')
         latitude = string(default='')
         altitude = string(default='')
@@ -179,8 +179,8 @@ sample_rate = float
                       {'memory': 'MemoryQueue',
                        'sqlite': 'SQLiteQueue'},
                       'Security':
-                      {'rsa': 'RSASecurity',
-                       'm2': 'M2Security'},
+                      {'rsa': 'pypiRsa.RSASecurity',
+                       'm2': 'm2crypto.M2Security'},
                       'Transport':
                       {'http': 'http.QueuedHttpPostTransport'},
                       'Data':
