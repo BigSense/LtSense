@@ -1,11 +1,16 @@
 from ltsense.sensors import AbstractSensor
-
+import logging
+import sys
 
 class AbstractOwfsSensor(AbstractSensor):
 
     def __init__(self, ow_sensor):
         AbstractSensor.__init__(self)
-        import ow
+        try:
+            import ow
+        except ImportError:
+            logging.error('1-Wire Python Module not found. Did you install python-ow?')
+            sys.exit(8)
         self.ow_sensor = ow_sensor
         self.id = ow_sensor.id
 
