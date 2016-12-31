@@ -52,17 +52,22 @@ sample_rate = float
 
 [Handlers]
   [[__many__]]
-    type = option('virtual','1wire')
+    type = option('virtual','1wire','phidget')
     sensors = list(default=None)
     device = string(default=None)
+    attach_timeout = integer(default=None)
+    data_rate = integer(default=None)
 
 [Sensors]
   [[__many__]]
-    type = option('virtual/temp')
-    id = string
-    units = string
-    rangeMin = integer
-    rangeMax = integer
+    type = option('virtual/temp', 'phidget')
+    id = string(default=None)
+    units = string(default=None)
+    rangeMin = integer(default=None)
+    rangeMax = integer(default=None)
+    port_num = integer(default=None)
+    port_type = option('analog','digital', default=None)
+    model = string(default=None)
 """
 
 # Taken from
@@ -187,10 +192,12 @@ sample_rate = float
                       {'sense.xml': 'SenseDataHandler'},
                       'Sensors':
                       {'virtual/temp': 'virtual.VirtualTemperatureSensor',
-                       'virtual/image': 'virtual.ImageSensor'},
+                       'virtual/image': 'virtual.ImageSensor',
+                       'phidget': 'phidget.PhidgetSensor'},
                       'Handlers':
                       {'virtual': 'GeneralSensorHandler',
-                       '1wire': 'OWFSSensorHandler'},
+                       '1wire': 'OWFSSensorHandler',
+                       'phidget': 'PhidgetSensorHandler'},
                       }
 
         cfg = ConfigObj(filename, configspec=BootStrap.config_specification.split('\n'))
