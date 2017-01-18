@@ -14,7 +14,7 @@ sample_rate = float
 
 [Data]
   [[__many__]]
-    type = option('sense.xml')
+    type = option('sense.xml', 'sense.json')
       [[[Identifier]]]
         type = option("name", "mac", "uuid")
         adapter = string(default='')
@@ -189,7 +189,8 @@ sample_rate = float
                       'Transport':
                       {'http': 'http.QueuedHttpPostTransport'},
                       'Data':
-                      {'sense.xml': 'SenseDataHandler'},
+                      {'sense.xml': 'SenseXMLDataHandler',
+                       'sense.json': 'SenseJsonDataHandler'},
                       'Sensors':
                       {'virtual/temp': 'virtual.VirtualTemperatureSensor',
                        'virtual/image': 'virtual.ImageSensor',
