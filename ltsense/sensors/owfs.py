@@ -26,3 +26,16 @@ class TemperatureSensor(AbstractOwfsSensor):
         return self.ow_sensor.temperature.strip()
 
     data = property(_read_temp, lambda self, v: None)
+
+
+class HumiditySensor(AbstractOwfsSensor):
+
+    def __init__(self, ow_sensor):
+        AbstractOwfsSensor.__init__(self, ow_sensor)
+        self.units = '%'
+        self.type = 'Humidity'
+
+    def _read_temp(self):
+        return self.ow_sensor.humidity.strip()
+
+    data = property(_read_temp, lambda self, v: None)

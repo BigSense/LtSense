@@ -1,5 +1,5 @@
 # --- Sensor Handlers --- #
-from ltsense.sensors.owfs import TemperatureSensor
+from ltsense.sensors.owfs import TemperatureSensor, HumiditySensor
 import logging
 
 
@@ -118,8 +118,10 @@ class OWFSSensorHandler(AbstractSensorHandler):
         sensors = []
         try:
             for s in ow.Sensor('/').sensorList():
-                if s.family == '28' or s.family == '10':
+                if hasattr(s, 'temperature'):
                      sensors.append(TemperatureSensor(s))
+                if hasattr(s, 'humidity'):
+                    sensors.append(HumiditySensor(s))
             return sensors
         except ow.exUnknownSensor as e:
             logging.warn('Error Reading 1-Wire: {}'.format(e))
