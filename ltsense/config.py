@@ -40,7 +40,9 @@ sample_rate = float
     url = string
     pause_rate = float
     timeout = float
-    type = option('http')
+    type = option('http', 'file')
+    directory = string(default='/tmp')
+    file_extension = string(default='json')
       [[[Queue]]]
         type = option('memory','sqlite')
         data = string(default='')
@@ -60,7 +62,7 @@ sample_rate = float
 
 [Sensors]
   [[__many__]]
-    type = option('virtual/temp', 'phidget')
+    type = option('virtual/temp', 'phidget', 'camera/cv2', 'camera/pi')
     id = string(default=None)
     units = string(default=None)
     rangeMin = integer(default=None)
@@ -187,13 +189,16 @@ sample_rate = float
                       {'rsa': 'pypiRsa.RSASecurity',
                        'm2': 'm2crypto.M2Security'},
                       'Transport':
-                      {'http': 'http.QueuedHttpPostTransport'},
+                      {'http': 'http.QueuedHttpPostTransport',
+                       'file': 'localfile.LocalFileTransport'},
                       'Data':
                       {'sense.xml': 'SenseXMLDataHandler',
                        'sense.json': 'SenseJsonDataHandler'},
                       'Sensors':
                       {'virtual/temp': 'virtual.VirtualTemperatureSensor',
                        'virtual/image': 'virtual.ImageSensor',
+                       'camera/cv2': 'camera.CV2Camera',
+                       'camera/pi': 'pi.PiCamera',
                        'phidget': 'phidget.PhidgetSensor'},
                       'Handlers':
                       {'virtual': 'GeneralSensorHandler',
