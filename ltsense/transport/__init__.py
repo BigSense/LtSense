@@ -12,7 +12,7 @@ import ltsense
 
 class AbstractTransport(object):
 
-    """Base class for all transport handlers. It's not very useful to 
+    """Base class for all transport handlers. It's not very useful to
     extend this class directly. It's better to extend the QueuedTransport"""
 
     def __init__(self):
@@ -37,9 +37,9 @@ class AbstractTransport(object):
 
 class QueuedTransport(AbstractTransport, Thread):
 
-    """Base class for all transports that which to use a queueing system.
+    """Base class for all transports that wish to use a queueing system.
     The send_package() function is implemented and a new abstract function,
-    _run_transport() need to be implemented in the subclass to transport the 
+    _run_transport() needs to be implemented in the subclass to transport the
     data."""
 
     def __init__(self):
@@ -91,8 +91,8 @@ class QueuedTransport(AbstractTransport, Thread):
         self.queue.enqueue(payload)
 
     def _run_transport(self, payload):
-        """Implement this function in subclasses to transport data. 
-        Return false if the data failed to transport so it will be 
+        """Implement this function in subclasses to transport data.
+        Return false if the data failed to transport so it will be
         placed back in the queue."""
         logging.warn('Unimplemented Queue Transport Detected. You have tried to use an abstract class. Did you want QueuedHttpPostTransport?')
         return True

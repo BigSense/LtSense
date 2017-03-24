@@ -27,19 +27,19 @@ class AbstractLocation(object):
     def location(self):
         """
         Returns a dictionary with {longitude, latitude, altitude,
-        speed, climb, track, longitude_error, latitude_error, 
-        altitude_error, speed_error, climb_error, 
+        speed, climb, track, longitude_error, latitude_error,
+        altitude_error, speed_error, climb_error,
         track_error} or None.
         This should return immediately. Population of GPS data
-        should occur in a seperate thread. 
+        should occur in a seperate thread.
         """
         if not self.location_ready:
             return None
         else:
-            return { 'longitude': self.longitude, 'latitude': self.latitude, 
+            return { 'longitude': self.longitude, 'latitude': self.latitude,
                      'altitude': self.altitude, 'speed': self.speed,
                      'climb': self.climb, 'track': self.track,
-                     'longitude_error': self.longitude_error, 
+                     'longitude_error': self.longitude_error,
                      'latitude_error': self.latitude_error,
                      'altitude_error': self.altitude_error,
                      'speed_error': self.speed_error,
@@ -90,8 +90,8 @@ class GPSLocation(AbstractLocation, Thread):
                 # We've lost our GPS fix. Stop adding Location info
                 elif report['class'] == 'TPV' and report['mode'] != 3:
                     if self.location_ready:
-                        logging.info('GPS 3D Lock Lost')    
-                    self.location_ready = False                
+                        logging.info('GPS 3D Lock Lost (Mode:{})'.format(report['mode']))
+                    self.location_ready = False
                 time.sleep(self.poll_rate)
         except StopIteration:
             logging.error('GPS Thread Stopped')
