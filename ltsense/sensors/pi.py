@@ -14,9 +14,9 @@ class PiCamera(AbstractSensor):
         self._camera.start_preview()
 
     def _photo_base64(self):
-        stream = io.BytesIO()
-        camera.capture(stream, 'jpeg')
-        stream.seek(0)
-        base64.b64encode(stream.getvalue())
+        with io.BytesIO() as stream:
+            self._camera.capture(stream, 'jpeg')
+            stream.seek(0)
+            return base64.b64encode(stream.getvalue())
 
     data = property(_photo_base64, lambda self, v: None)
