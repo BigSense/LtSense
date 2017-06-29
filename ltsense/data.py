@@ -36,7 +36,7 @@ class SenseJsonDataHandler(AbstractDataHandler):
     def render_data(self, sensors):
 
         data = {'id': self.identifier.identify(),
-                'timestamp': self.timestamp()}
+                'timestamp': str(self.timestamp())}
         # Location
         if self.location is not None:
             loc_info = {}
