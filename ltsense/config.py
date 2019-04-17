@@ -62,7 +62,7 @@ sample_rate = float
 
 [Sensors]
   [[__many__]]
-    type = option('virtual/temp', 'phidget', 'camera/cv2', 'camera/pi')
+    type = option('virtual/temp', 'phidget', 'camera/cv2', 'camera/pi', 'spi/mcp3008')
     id = string(default=None)
     units = string(default=None)
     rangeMin = integer(default=None)
@@ -70,6 +70,9 @@ sample_rate = float
     port_num = integer(default=None)
     port_type = option('analog','digital', default=None)
     model = string(default=None)
+    spi_port = integer(default=None)
+    spi_device = integer(default=None)
+    channel = integer(default=None)
 """
 
 # Taken from
@@ -199,7 +202,8 @@ sample_rate = float
                        'virtual/image': 'virtual.ImageSensor',
                        'camera/cv2': 'camera.CV2Camera',
                        'camera/pi': 'pi.PiCamera',
-                       'phidget': 'phidget.PhidgetSensor'},
+                       'phidget': 'phidget.PhidgetSensor',
+                       'spi/mcp3008': 'spi.MCP3008'},
                       'Handlers':
                       {'virtual': 'GeneralSensorHandler',
                        '1wire': 'OWFSSensorHandler',

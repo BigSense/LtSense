@@ -1,6 +1,6 @@
 #!/usr/bin/env/python
 
-from Queue import Queue, Empty
+from queue import Queue, Empty
 import sqlite3
 from threading import Lock
 

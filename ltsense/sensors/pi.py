@@ -16,6 +16,7 @@ class PiCamera(AbstractSensor):
     def _photo_base64(self):
         with io.BytesIO() as stream:
             self._camera.capture(stream, 'jpeg')
+            self._camera.resolution = self._camera.MAX_RESOLUTION
             stream.seek(0)
             return base64.b64encode(stream.getvalue())
 
